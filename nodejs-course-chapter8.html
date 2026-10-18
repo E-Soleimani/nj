@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>دوره Node.js — فصل ۸: Testing & TDD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--border:#2a3347;--accent:#4ade80;--accent2:#22d3ee;--accent3:#a78bfa;--text:#e2e8f0;--text-muted:#8b9ab5;--text-dim:#4a5568;--code-bg:#0d1117}
+  body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;display:flex;min-height:100vh;overflow-x:hidden}
+  .sidebar{width:280px;min-width:280px;background:var(--bg2);border-left:1px solid var(--border);padding:2rem 0;position:fixed;right:0;top:0;height:100vh;overflow-y:auto;z-index:100}
+  .sidebar-logo{padding:0 1.5rem 1.5rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+  .sidebar-logo .logo-icon{width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem}
+  .sidebar-logo h2{font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px}
+  .sidebar-logo p{font-size:12px;color:var(--text-muted)}
+  .nav-section-title{font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;padding:0 1.5rem;margin:1.25rem 0 0.5rem}
+  .nav-item{display:flex;align-items:center;gap:0.6rem;padding:0.55rem 1.5rem;font-size:13px;color:var(--text-muted);cursor:pointer;border-right:3px solid transparent;transition:all 0.15s;text-decoration:none}
+  .nav-item:hover{background:var(--bg3);color:var(--text)}
+  .nav-item.active{background:rgba(74,222,128,0.08);color:var(--accent);border-right-color:var(--accent);font-weight:500}
+  .nav-item .num{font-size:11px;background:var(--bg3);border-radius:4px;padding:1px 6px;min-width:24px;text-align:center;font-family:'Fira Code',monospace}
+  .nav-item.active .num{background:rgba(74,222,128,0.15);color:var(--accent)}
+  .main{margin-right:280px;flex:1;padding:3rem 3.5rem 5rem;max-width:860px}
+  .chapter-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);border-radius:20px;padding:4px 14px;font-size:12px;color:var(--accent);margin-bottom:1rem;font-weight:500}
+  h1.chapter-title{font-size:2.2rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:0.75rem}
+  h1.chapter-title span{color:var(--accent)}
+  .chapter-desc{font-size:16px;color:var(--text-muted);margin-bottom:2.5rem;max-width:600px}
+  .divider{height:1px;background:var(--border);margin:2.5rem 0}
+  h2.section-title{font-size:1.25rem;font-weight:700;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;gap:10px}
+  h2.section-title::before{content:'';display:block;width:4px;height:22px;background:var(--accent);border-radius:2px}
+  h3.sub-title{font-size:1rem;font-weight:700;color:var(--accent2);margin:1.5rem 0 0.6rem}
+  p{color:var(--text-muted);font-size:15px;margin-bottom:1rem}
+  strong{color:var(--text);font-weight:600}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin:1rem 0}
+  .tag{font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;font-family:'Fira Code',monospace}
+  .tag.green{background:rgba(22,101,52,0.4);color:#86efac;border:1px solid rgba(134,239,172,0.2)}
+  .tag.blue{background:rgba(30,58,95,0.6);color:#7dd3fc;border:1px solid rgba(125,211,252,0.2)}
+  .tag.purple{background:rgba(59,31,110,0.6);color:#c4b5fd;border:1px solid rgba(196,181,253,0.2)}
+  .code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:12px;margin:1.25rem 0;overflow:hidden;direction:ltr}
+  .code-header{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 1rem;background:var(--bg3);border-bottom:1px solid var(--border);direction:ltr}
+  .code-header .dots{display:flex;gap:6px}
+  .code-header .dot{width:10px;height:10px;border-radius:50%}
+  .code-header .dot.red{background:#ff5f56}.code-header .dot.yellow{background:#ffbd2e}.code-header .dot.green{background:#27c93f}
+  .code-header .filename{font-size:12px;color:var(--text-muted);font-family:'Fira Code',monospace}
+  .code-body{padding:1.25rem 1.5rem;font-family:'Fira Code',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;white-space:pre;color:#e2e8f0;text-align:left;direction:ltr}
+  .c-comment{color:#6b7e99}.c-keyword{color:#c084fc}.c-string{color:#86efac}.c-fn{color:#67e8f9}.c-num{color:#fb923c}.c-op{color:#94a3b8}
+  .note-box{background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.25);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0;display:flex;gap:0.75rem}
+  .note-box p{color:var(--text-muted);font-size:14px;margin:0}
+  .note-box strong{color:var(--accent2)}
+  .warn-box{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0;display:flex;gap:0.75rem}
+  .warn-box p{color:var(--text-muted);font-size:14px;margin:0}
+  .warn-box strong{color:#fbbf24}
+  .explain-box{background:var(--bg2);border-right:3px solid var(--accent3);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin:1rem 0}
+  .explain-box p{font-size:14px;color:var(--text-muted);margin:0}
+  .explain-box strong{color:var(--accent3)}
+  .key-points{list-style:none;margin:1rem 0}
+  .key-points li{display:flex;gap:0.75rem;align-items:flex-start;margin-bottom:0.75rem;font-size:14px;color:var(--text-muted)}
+  .key-points li::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0;margin-top:2px}
+  .tdd-cycle{display:flex;justify-content:center;align-items:center;gap:1.5rem;margin:2rem 0;flex-wrap:wrap;direction:ltr}
+  .tdd-step{text-align:center;padding:1.5rem;background:var(--bg2);border:1px solid var(--border);border-radius:14px;width:160px}
+  .tdd-step .icon{font-size:2rem;margin-bottom:0.5rem}
+  .tdd-step h4{font-size:14px;font-weight:700;margin-bottom:6px}
+  .tdd-step p{font-size:12px;color:var(--text-muted);margin:0}
+  .tdd-step.red{border-color:rgba(248,113,113,0.4);background:rgba(248,113,113,0.05)}
+  .tdd-step.red h4{color:#f87171}
+  .tdd-step.green{border-color:rgba(74,222,128,0.4);background:rgba(74,222,128,0.05)}
+  .tdd-step.green h4{color:var(--accent)}
+  .tdd-step.blue{border-color:rgba(34,211,238,0.4);background:rgba(34,211,238,0.05)}
+  .tdd-step.blue h4{color:var(--accent2)}
+  .tdd-arrow{font-size:24px;color:var(--text-dim)}
+  .test-types{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0}
+  .test-type{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem;text-align:center}
+  .test-type .t-icon{font-size:2rem;margin-bottom:0.5rem}
+  .test-type h4{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+  .test-type p{font-size:12px;color:var(--text-muted);margin:0}
+  .chapter-nav{display:flex;justify-content:space-between;margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border)}
+  .nav-btn{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:14px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;font-family:'Vazirmatn',sans-serif}
+  .nav-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .nav-btn.next{background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.3);color:var(--accent)}
+  
+
+  /* --- Fix: راست‌چین کردن کامنت‌های فارسی داخل بلوک کد --- */
+  .c-comment{unicode-bidi:isolate;direction:rtl}
+
+  /* --- Fix: ریسپانسیو کامل --- */
+  @media(max-width:1024px){
+    .main{margin-right:240px;padding:2rem}
+    .sidebar{width:240px;min-width:240px}
+  }
+  @media(max-width:900px){
+    body{display:block}
+    .main{margin-right:0;padding:1.25rem;max-width:100%}
+    h1.chapter-title{font-size:1.6rem}
+    .chapter-desc{font-size:14px}
+    /* Safety net: هر گرید یا فلکس چندستونه در موبایل تک‌ستونی و ایمن شود */
+    .compare-grid,.cg-card,.use-cases,.pattern-grid,.arch-grid,
+    .branch-grid,.cmd-grid,.range-grid,.module-compare,.pillar-grid,
+    .test-types,.ts-benefits,.compare-row,.error-types{grid-template-columns:1fr!important}
+    .semver-box,.di-diagram,.git-states,.tdd-cycle,.ws-clients,.flow-row{flex-wrap:wrap!important}
+    .git-state,.tdd-step{flex:1 1 100%!important;min-width:0!important}
+    .code-body{font-size:12px;padding:1rem}
+    .chapter-nav{flex-direction:column;gap:10px}
+    .nav-btn{width:100%;justify-content:center;text-align:center}
+    .tags{gap:6px}
+    .tag{font-size:11px;padding:3px 10px}
+  }
+  @media(max-width:480px){
+    .main{padding:1rem}
+    h1.chapter-title{font-size:1.35rem}
+    .code-body{font-size:11px;padding:0.75rem}
+    .code-header .filename{font-size:10px}
+    .chapter-badge{font-size:11px;padding:3px 10px}
+  }
+  /* دکمه‌های قبلی/بعدی حالا لینک هستند نه button - استایل یکسان بماند */
+  a.nav-btn{text-decoration:none}
+  a.nav-btn.disabled{opacity:0.4;pointer-events:none;cursor:default}
+
+  /* --- Fix: دکمه همبرگری و منوی موبایل --- */
+  .mobile-menu-btn{
+    display:none;
+    position:fixed;
+    top:16px;
+    right:16px;
+    z-index:200;
+    width:44px;
+    height:44px;
+    background:var(--bg2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+  }
+  .mobile-menu-btn svg{width:22px;height:22px;stroke:var(--accent)}
+  .mobile-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    z-index:150;
+  }
+  .mobile-overlay.open{display:block}
+
+  @media(max-width:900px){
+    .mobile-menu-btn{display:flex}
+    .sidebar{
+      display:flex!important;
+      flex-direction:column;
+      transform:translateX(100%);
+      transition:transform 0.25s ease;
+      z-index:180;
+      box-shadow:-4px 0 20px rgba(0,0,0,0.4);
+    }
+    .sidebar.open{transform:translateX(0)}
+    .main{padding-top:4.5rem}
+  }
+</style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="باز کردن منو">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+</button>
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0f1117" stroke-width="2.5" stroke-linecap="round" width="22" height="22"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+    <h2>دوره Node.js</h2><p>۶۳ فصل — مقدماتی تا پیشرفته</p>
+  </div>
+  <div class="nav-section-title">بخش مقدماتی</div>
+  <a class="nav-item" href="nodejs-course-chapter1.html"><span class="num">01</span> معماری و تاریخچه</a>
+  <a class="nav-item" href="nodejs-course-chapter2.html"><span class="num">02</span> توسعه روی Linux</a>
+  <a class="nav-item" href="nodejs-course-chapter3.html"><span class="num">03</span> NPM و ماژول‌ها</a>
+  <a class="nav-item" href="nodejs-course-chapter4.html"><span class="num">04</span> Semantic Versioning</a>
+  <a class="nav-item" href="nodejs-course-chapter5.html"><span class="num">05</span> Git Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter6.html"><span class="num">06</span> Git Flow</a>
+  <a class="nav-item" href="nodejs-course-chapter7.html"><span class="num">07</span> Github</a>
+  <a class="nav-item active" href="nodejs-course-chapter8.html"><span class="num">08</span> Testing & TDD</a>
+  <a class="nav-item" href="nodejs-course-chapter9.html"><span class="num">09</span> JS Fundamentals</a>
+  <a class="nav-item" href="nodejs-course-chapter10.html"><span class="num">10</span> OOP</a>
+  <a class="nav-item" href="nodejs-course-chapter11.html"><span class="num">11</span> Advanced JS</a>
+  <a class="nav-item" href="nodejs-course-chapter12.html"><span class="num">12</span> TypeScript</a>
+  <a class="nav-item" href="nodejs-course-chapter13.html"><span class="num">13</span> Error Handling</a>
+  <a class="nav-item" href="nodejs-course-chapter14.html"><span class="num">14</span> Async Programming</a>
+  <a class="nav-item" href="nodejs-course-chapter15.html"><span class="num">15</span> Non-Blocking & Concurrency</a>
+  <a class="nav-item" href="nodejs-course-chapter16.html"><span class="num">16</span> Async Flow Control</a>
+  <a class="nav-item" href="nodejs-course-chapter17.html"><span class="num">17</span> Web Server (Fastify)</a>
+  <a class="nav-item" href="nodejs-course-chapter18.html"><span class="num">18</span> Chat Server</a>
+  <a class="nav-item" href="nodejs-course-chapter19.html"><span class="num">19</span> Docker</a>
+  <a class="nav-item" href="nodejs-course-chapter20.html"><span class="num">20</span> MongoDB</a>
+  <a class="nav-item" href="nodejs-course-chapter21.html"><span class="num">21</span> Redis Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter22.html"><span class="num">22</span> Frameworks & IOC</a>
+  <a class="nav-item" href="nodejs-course-chapter23.html"><span class="num">23</span> NestJS</a>
+  <div class="nav-section-title">بخش پیشرفته</div>
+  <a class="nav-item" href="nodejs-course-chapter24.html"><span class="num">24</span> Currying & Composition</a>
+  <a class="nav-item" href="nodejs-course-chapter25.html"><span class="num">25</span> Isomorphic & Idempotent</a>
+  <a class="nav-item" href="nodejs-course-chapter26.html"><span class="num">26</span> Functional Data Modeling</a>
+  <a class="nav-item" href="nodejs-course-chapter27.html"><span class="num">27</span> Zod</a>
+  <a class="nav-item" href="nodejs-course-chapter28.html"><span class="num">28</span> SOLID</a>
+  <a class="nav-item" href="nodejs-course-chapter29.html"><span class="num">29</span> GoF Design Patterns</a>
+  <a class="nav-item" href="nodejs-course-chapter30.html"><span class="num">30</span> Refactoring</a>
+  <a class="nav-item" href="nodejs-course-chapter31.html"><span class="num">31</span> Event Emitter</a>
+  <a class="nav-item" href="nodejs-course-chapter32.html"><span class="num">32</span> Pub/Sub (Cluster)</a>
+  <a class="nav-item" href="nodejs-course-chapter33.html"><span class="num">33</span> Queues & Brokers</a>
+  <a class="nav-item" href="nodejs-course-chapter34.html"><span class="num">34</span> Working with Streams</a>
+  <a class="nav-item" href="nodejs-course-chapter35.html"><span class="num">35</span> Custom Streams & Generators</a>
+  <a class="nav-item" href="nodejs-course-chapter36.html"><span class="num">36</span> RxJS</a>
+  <a class="nav-item" href="nodejs-course-chapter37.html"><span class="num">37</span> 12 Factor App</a>
+  <a class="nav-item" href="nodejs-course-chapter38.html"><span class="num">38</span> Resilience Patterns</a>
+  <a class="nav-item" href="nodejs-course-chapter39.html"><span class="num">39</span> Postgres Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter40.html"><span class="num">40</span> TypeORM</a>
+  <a class="nav-item" href="nodejs-course-chapter41.html"><span class="num">41</span> TS: Thinking in Types</a>
+  <a class="nav-item" href="nodejs-course-chapter42.html"><span class="num">42</span> Web Frameworks Compare</a>
+  <a class="nav-item" href="nodejs-course-chapter43.html"><span class="num">43</span> Onion & Clean Architecture</a>
+  <a class="nav-item" href="nodejs-course-chapter44.html"><span class="num">44</span> Microservices Patterns</a>
+  <div class="nav-section-title">بخش تکمیلی</div>
+  <a class="nav-item" href="nodejs-course-chapter45.html"><span class="num">45</span> Authentication (JWT)</a>
+  <a class="nav-item" href="nodejs-course-chapter46.html"><span class="num">46</span> Authorization & RBAC</a>
+  <a class="nav-item" href="nodejs-course-chapter47.html"><span class="num">47</span> Security Essentials</a>
+  <a class="nav-item" href="nodejs-course-chapter48.html"><span class="num">48</span> Caching Strategies</a>
+  <a class="nav-item" href="nodejs-course-chapter49.html"><span class="num">49</span> API Design</a>
+  <a class="nav-item" href="nodejs-course-chapter50.html"><span class="num">50</span> Monitoring & Observability</a>
+  <a class="nav-item" href="nodejs-course-chapter51.html"><span class="num">51</span> Advanced Testing</a>
+  <a class="nav-item" href="nodejs-course-chapter52.html"><span class="num">52</span> Node.js Internals & Memory</a>
+  <a class="nav-item" href="nodejs-course-chapter53.html"><span class="num">53</span> Serverless (AWS Lambda)</a>
+  <a class="nav-item" href="nodejs-course-chapter54.html"><span class="num">54</span> CI/CD Pipeline کامل</a>
+  <div class="nav-section-title">بخش عملی نهایی</div>
+  <a class="nav-item" href="nodejs-course-chapter55.html"><span class="num">55</span> PM2 & Process Management</a>
+  <a class="nav-item" href="nodejs-course-chapter56.html"><span class="num">56</span> File Upload & Streaming</a>
+  <a class="nav-item" href="nodejs-course-chapter57.html"><span class="num">57</span> Webhooks</a>
+  <a class="nav-item" href="nodejs-course-chapter58.html"><span class="num">58</span> Cron & Scheduled Tasks</a>
+  <a class="nav-item" href="nodejs-course-chapter59.html"><span class="num">59</span> npm Monorepo & Workspaces</a>
+  <a class="nav-item" href="nodejs-course-chapter60.html"><span class="num">60</span> Config Validation & Feature Flags</a>
+  <a class="nav-item" href="nodejs-course-chapter61.html"><span class="num">61</span> gRPC</a>
+  <div class="nav-section-title">تمرکز ویژه مصاحبه</div>
+  <a class="nav-item" href="nodejs-course-chapter62.html"><span class="num">62</span> Express.js عمیق</a>
+  <a class="nav-item" href="nodejs-course-chapter63.html"><span class="num">63</span> NestJS پیشرفته</a>
+  <a class="nav-item" href="nodejs-course-chapter64.html"><span class="num">64</span> OOP کامل و Decorators</a>
+</aside>
+
+<main class="main">
+  <div class="chapter-badge"><span>●</span> فصل هشتم</div>
+  <h1 class="chapter-title">Testing &<br/><span>TDD Basics</span></h1>
+  <p class="chapter-desc">
+    تست نوشتن یعنی کدی بنویسید که کد دیگرتان را چک کند.
+    این کار باعث می‌شود هنگام تغییر کد، مطمئن باشید چیزی نشکسته.
+    TDD یک رویکرد است که می‌گوید اول تست بنویسید، بعد کد.
+  </p>
+  <div class="tags">
+    <span class="tag green">Jest</span>
+    <span class="tag blue">Unit Test</span>
+    <span class="tag purple">TDD</span>
+    <span class="tag green">Mock</span>
+    <span class="tag blue">Coverage</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">چرا تست بنویسیم؟</h2>
+  <p>
+    تصور کنید یک تابع ۱۰۰ خطی دارید. بعد از چند ماه باید آن را تغییر دهید.
+    بدون تست نمی‌دانید آیا تغییرتان چیزی شکسته یا نه — باید دستی همه چیز را امتحان کنید.
+    با تست، بعد از هر تغییر فقط دستور <code>npm test</code> می‌زنید و در چند ثانیه می‌دانید همه چیز درست است.
+  </p>
+
+  <div class="explain-box">
+    <p><strong>تشبیه:</strong> تست مثل دستورالعمل تست کارخانه است. قبل از اینکه ماشین از خط تولید بیاید بیرون، ۵۰۰ چک خودکار روی آن انجام می‌شود. اگر یکی fail شود، ماشین خط تولید را ترک نمی‌کند.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">سه نوع تست</h2>
+
+  <div class="test-types">
+    <div class="test-type">
+      <div class="t-icon">🔬</div>
+      <h4>Unit Test</h4>
+      <p>تست یک تابع یا کلاس به تنهایی — بدون database یا شبکه. سریع است و زیاد نوشته می‌شود.</p>
+    </div>
+    <div class="test-type">
+      <div class="t-icon">🔗</div>
+      <h4>Integration Test</h4>
+      <p>تست چند ماژول با هم — مثلاً route + service + database. کندتر ولی واقعی‌تر.</p>
+    </div>
+    <div class="test-type">
+      <div class="t-icon">🌐</div>
+      <h4>E2E Test</h4>
+      <p>تست کل سیستم از دید کاربر — مثلاً با مرورگر. کندترین ولی جامع‌ترین.</p>
+    </div>
+  </div>
+
+  <div class="note-box">
+    <span style="font-size:18px;flex-shrink:0">💡</span>
+    <p><strong>قانون هرم تست:</strong> Unit test زیاد بنویسید (سریع و ارزان است). Integration test متوسط. E2E کم (کند و گران است). نسبت معمول: ۷۰٪ Unit، ۲۰٪ Integration، ۱۰٪ E2E.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">TDD — Test Driven Development</h2>
+  <p>
+    TDD یک روش توسعه است که می‌گوید: <strong>اول تست بنویس، بعد کد.</strong>
+    این عجیب به نظر می‌رسد ولی فوایدی دارد:
+    کد شما قابل تست می‌شود، طراحی بهتر می‌شود، و coverage بالا می‌رود.
+  </p>
+
+  <div class="tdd-cycle">
+    <div class="tdd-step red">
+      <div class="icon">🔴</div>
+      <h4>Red — تست بنویس</h4>
+      <p>یک تست بنویس که fail می‌شود چون کد هنوز نوشته نشده</p>
+    </div>
+    <div class="tdd-arrow">→</div>
+    <div class="tdd-step green">
+      <div class="icon">🟢</div>
+      <h4>Green — کد بنویس</h4>
+      <p>کمترین کد ممکن برای اینکه تست pass شود</p>
+    </div>
+    <div class="tdd-arrow">→</div>
+    <div class="tdd-step blue">
+      <div class="icon">🔵</div>
+      <h4>Refactor — بهتر کن</h4>
+      <p>کد را تمیز کن. تست باید هنوز pass باشد</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">نصب و راه‌اندازی Jest</h2>
+  <p>
+    <strong>Jest</strong> محبوب‌ترین testing framework برای JavaScript و Node.js است.
+    توسط Facebook ساخته شده و همه چیز دارد: runner، assertion، mock، coverage.
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">terminal</span></div>
+    <div class="code-body"><span class="c-comment"># نصب Jest</span>
+npm install --save-dev jest
+
+<span class="c-comment"># برای TypeScript</span>
+npm install --save-dev jest @types/jest ts-jest</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">package.json</span></div>
+    <div class="code-body">{
+  "scripts": {
+    "test":          "jest",
+    "test:watch":    "jest --watch",      <span class="c-comment">// هر بار فایل تغییر کند، تست‌ها دوباره اجرا می‌شوند</span>
+    "test:coverage": "jest --coverage"    <span class="c-comment">// گزارش coverage هم می‌دهد</span>
+  }
+}</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">مثال ۱ — اولین تست با Jest</h2>
+  <p>فرض کنید می‌خواهید تابع تقسیم بنویسید. با TDD شروع می‌کنیم:</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">🔴 مرحله اول — تست بنویسید (هنوز کد نیست)</span></div>
+    <div class="code-body"><span class="c-comment">// math.test.js</span>
+<span class="c-keyword">const</span> { add, divide } = <span class="c-fn">require</span>(<span class="c-string">'./math'</span>);
+
+<span class="c-comment">// describe گروه‌بندی می‌کند</span>
+<span class="c-fn">describe</span>(<span class="c-string">'Math Utils'</span>, () => {
+
+  <span class="c-fn">describe</span>(<span class="c-string">'add()'</span>, () => {
+    <span class="c-fn">it</span>(<span class="c-string">'باید دو عدد مثبت را جمع کند'</span>, () => {
+      <span class="c-fn">expect</span>(<span class="c-fn">add</span>(<span class="c-num">2</span>, <span class="c-num">3</span>)).<span class="c-fn">toBe</span>(<span class="c-num">5</span>);
+    });
+
+    <span class="c-fn">it</span>(<span class="c-string">'باید با عدد منفی هم کار کند'</span>, () => {
+      <span class="c-fn">expect</span>(<span class="c-fn">add</span>(-<span class="c-num">1</span>, <span class="c-num">5</span>)).<span class="c-fn">toBe</span>(<span class="c-num">4</span>);
+    });
+  });
+
+  <span class="c-fn">describe</span>(<span class="c-string">'divide()'</span>, () => {
+    <span class="c-fn">it</span>(<span class="c-string">'باید تقسیم درست انجام دهد'</span>, () => {
+      <span class="c-fn">expect</span>(<span class="c-fn">divide</span>(<span class="c-num">10</span>, <span class="c-num">2</span>)).<span class="c-fn">toBe</span>(<span class="c-num">5</span>);
+    });
+
+    <span class="c-fn">it</span>(<span class="c-string">'باید خطا بدهد وقتی تقسیم بر صفر است'</span>, () => {
+      <span class="c-comment">// expect می‌کنیم که خطا بدهد</span>
+      <span class="c-fn">expect</span>(() => <span class="c-fn">divide</span>(<span class="c-num">10</span>, <span class="c-num">0</span>)).<span class="c-fn">toThrow</span>(<span class="c-string">'Cannot divide by zero'</span>);
+    });
+  });
+});
+
+<span class="c-comment">// npm test → ❌ FAIL — math.js وجود ندارد</span></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">🟢 مرحله دوم — کد بنویسید تا تست pass شود</span></div>
+    <div class="code-body"><span class="c-comment">// math.js</span>
+<span class="c-keyword">function</span> <span class="c-fn">add</span>(a, b) {
+  <span class="c-keyword">return</span> a + b;
+}
+
+<span class="c-keyword">function</span> <span class="c-fn">divide</span>(a, b) {
+  <span class="c-keyword">if</span> (b === <span class="c-num">0</span>) {
+    <span class="c-keyword">throw new</span> <span class="c-fn">Error</span>(<span class="c-string">'Cannot divide by zero'</span>);
+  }
+  <span class="c-keyword">return</span> a / b;
+}
+
+module.exports = { add, divide };
+
+<span class="c-comment">// npm test → ✅ PASS — همه تست‌ها pass شدند</span></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">مثال ۲ — Mock کردن</h2>
+  <p>
+    گاهی تابعی که می‌خواهید تست کنید به database یا API خارجی نیاز دارد.
+    در unit test نمی‌خواهیم به database واقعی وصل شویم — کند است و کنترل نداریم.
+    به جایش، database را <strong>mock</strong> می‌کنیم — یک نسخه fake می‌سازیم که رفتارش قابل کنترل است:
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">userService.test.js — با Mock</span></div>
+    <div class="code-body"><span class="c-keyword">const</span> userService = <span class="c-fn">require</span>(<span class="c-string">'./userService'</span>);
+<span class="c-keyword">const</span> db          = <span class="c-fn">require</span>(<span class="c-string">'./database'</span>);
+
+<span class="c-comment">// به Jest می‌گوییم database را mock کن — به جای database واقعی استفاده می‌شود</span>
+jest.<span class="c-fn">mock</span>(<span class="c-string">'./database'</span>);
+
+<span class="c-fn">describe</span>(<span class="c-string">'UserService'</span>, () => {
+
+  <span class="c-comment">// قبل از هر تست، همه mock‌ها reset می‌شوند</span>
+  <span class="c-fn">beforeEach</span>(() => {
+    jest.<span class="c-fn">clearAllMocks</span>();
+  });
+
+  <span class="c-fn">it</span>(<span class="c-string">'باید کاربر را با ID برگرداند'</span>, <span class="c-keyword">async</span> () => {
+    <span class="c-comment">// به mock می‌گوییم وقتی findUser صدا زده شد، این مقدار را برگردان</span>
+    db.findUser.<span class="c-fn">mockResolvedValue</span>({ id: <span class="c-num">1</span>, name: <span class="c-string">'Ali'</span>, email: <span class="c-string">'ali@test.com'</span> });
+
+    <span class="c-keyword">const</span> user = <span class="c-keyword">await</span> userService.<span class="c-fn">getUserById</span>(<span class="c-num">1</span>);
+
+    <span class="c-comment">// چک می‌کنیم نتیجه درست است</span>
+    <span class="c-fn">expect</span>(user.name).<span class="c-fn">toBe</span>(<span class="c-string">'Ali'</span>);
+
+    <span class="c-comment">// چک می‌کنیم database با پارامتر درست صدا زده شد</span>
+    <span class="c-fn">expect</span>(db.findUser).<span class="c-fn">toHaveBeenCalledWith</span>(<span class="c-num">1</span>);
+    <span class="c-fn">expect</span>(db.findUser).<span class="c-fn">toHaveBeenCalledTimes</span>(<span class="c-num">1</span>);
+  });
+
+  <span class="c-fn">it</span>(<span class="c-string">'باید خطا بدهد اگر کاربر پیدا نشود'</span>, <span class="c-keyword">async</span> () => {
+    db.findUser.<span class="c-fn">mockResolvedValue</span>(<span class="c-keyword">null</span>); <span class="c-comment">// کاربر پیدا نشد</span>
+
+    <span class="c-keyword">await</span> <span class="c-fn">expect</span>(userService.<span class="c-fn">getUserById</span>(<span class="c-num">999</span>))
+      .<span class="c-fn">rejects</span>
+      .<span class="c-fn">toThrow</span>(<span class="c-string">'User not found'</span>);
+  });
+});</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Matchers مهم Jest</h2>
+  <p>Matchers توابعی هستند که چک می‌کنند مقدار با انتظار شما برابر است:</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">matchers.js — راهنمای سریع</span></div>
+    <div class="code-body"><span class="c-comment">// مقایسه مقدار</span>
+<span class="c-fn">expect</span>(value).<span class="c-fn">toBe</span>(<span class="c-num">5</span>);            <span class="c-comment">// === (برای primitive)</span>
+<span class="c-fn">expect</span>(obj).<span class="c-fn">toEqual</span>({ a: <span class="c-num">1</span> });     <span class="c-comment">// deep equal (برای object/array)</span>
+<span class="c-fn">expect</span>(value).<span class="c-fn">not</span>.<span class="c-fn">toBe</span>(<span class="c-num">5</span>);        <span class="c-comment">// not — برعکس هر matcher</span>
+
+<span class="c-comment">// null و undefined</span>
+<span class="c-fn">expect</span>(value).<span class="c-fn">toBeNull</span>();
+<span class="c-fn">expect</span>(value).<span class="c-fn">toBeUndefined</span>();
+<span class="c-fn">expect</span>(value).<span class="c-fn">toBeDefined</span>();
+
+<span class="c-comment">// true و false</span>
+<span class="c-fn">expect</span>(value).<span class="c-fn">toBeTruthy</span>();    <span class="c-comment">// هر چیزی که truthy باشد</span>
+<span class="c-fn">expect</span>(value).<span class="c-fn">toBeFalsy</span>();     <span class="c-comment">// false, 0, '', null, undefined</span>
+
+<span class="c-comment">// عدد</span>
+<span class="c-fn">expect</span>(<span class="c-num">5</span>).<span class="c-fn">toBeGreaterThan</span>(<span class="c-num">3</span>);
+<span class="c-fn">expect</span>(<span class="c-num">0.1</span> + <span class="c-num">0.2</span>).<span class="c-fn">toBeCloseTo</span>(<span class="c-num">0.3</span>);  <span class="c-comment">// برای floating point</span>
+
+<span class="c-comment">// آرایه و string</span>
+<span class="c-fn">expect</span>([<span class="c-num">1</span>,<span class="c-num">2</span>,<span class="c-num">3</span>]).<span class="c-fn">toContain</span>(<span class="c-num">2</span>);
+<span class="c-fn">expect</span>(<span class="c-string">'hello world'</span>).<span class="c-fn">toMatch</span>(/world/);
+<span class="c-fn">expect</span>([<span class="c-num">1</span>,<span class="c-num">2</span>]).<span class="c-fn">toHaveLength</span>(<span class="c-num">2</span>);
+
+<span class="c-comment">// خطا</span>
+<span class="c-fn">expect</span>(() => <span class="c-fn">fn</span>()).<span class="c-fn">toThrow</span>();
+<span class="c-fn">expect</span>(() => <span class="c-fn">fn</span>()).<span class="c-fn">toThrow</span>(<span class="c-string">'Error message'</span>);
+
+<span class="c-comment">// async</span>
+<span class="c-keyword">await</span> <span class="c-fn">expect</span>(promise).<span class="c-fn">resolves</span>.<span class="c-fn">toBe</span>(<span class="c-string">'value'</span>);
+<span class="c-keyword">await</span> <span class="c-fn">expect</span>(promise).<span class="c-fn">rejects</span>.<span class="c-fn">toThrow</span>();</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">نکات کلیدی برای مصاحبه</h2>
+  <ul class="key-points">
+    <li>TDD چرخه <strong>Red → Green → Refactor</strong> است. اول تست، بعد کد، بعد بهتر کن.</li>
+    <li><strong>Unit test</strong> ایزوله است — هیچ وابستگی خارجی (database، API) نباید داشته باشد.</li>
+    <li><strong>Mock</strong> یعنی جایگزین کردن dependency با نسخه fake که رفتارش قابل کنترل است.</li>
+    <li><strong>describe</strong> گروه‌بندی می‌کند، <strong>it یا test</strong> یک تست منفرد تعریف می‌کند.</li>
+    <li><strong>beforeEach/afterEach</strong>: قبل/بعد از هر تست اجرا می‌شود — برای setup و cleanup.</li>
+    <li>هدف ۱۰۰٪ coverage نیست — تست‌های معنادار مهم‌تر از تعداد است.</li>
+    <li>در فاز <strong>Red</strong> باید تست واقعاً fail شود؛ اگر همان اول pass شود، یعنی یا تست اشتباه نوشته شده یا قابلیت از قبل وجود داشته.</li>
+    <li>در فاز <strong>Green</strong> فقط کمترین کد لازم برای pass شدن نوشته می‌شود — حتی اگر کد زیبا نباشد؛ زیبایی در فاز Refactor می‌آید.</li>
+    <li>سوال رایج: «فرق mock و stub چیست؟» — stub فقط یک مقدار ثابت برمی‌گرداند؛ mock علاوه بر این، رفتار (چند بار صدا زده شد، با چه پارامتری) را هم بررسی می‌کند.</li>
+    <li>یک تله رایج: نوشتن تست بعد از کد و اسمش را TDD گذاشتن — TDD یعنی تست دقیقاً قبل از کد نوشته شود، نه بعدش.</li>
+    <li><strong>Test Pyramid</strong>: پایه هرم Unit Testهای زیاد و سریع، وسط Integration Test کمتر، بالای هرم E2E Test خیلی کم — چون E2E کند و شکننده‌تر است.</li>
+  </ul>
+
+  <div class="chapter-nav">
+    <a class="nav-btn" href="nodejs-course-chapter7.html">← فصل قبلی: GitHub</a>
+    <a class="nav-btn next" href="nodejs-course-chapter9.html">فصل بعدی: JS Fundamentals →</a>
+  </div>
+</main>
+<script>
+function toggleMobileMenu(){
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('open');
+}
+// بستن منو با کلیک روی هر لینک فصل (تجربه بهتر در موبایل)
+document.querySelectorAll('.sidebar .nav-item').forEach(function(link){
+  link.addEventListener('click', function(){
+    document.querySelector('.sidebar').classList.remove('open');
+    document.getElementById('mobileOverlay').classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>

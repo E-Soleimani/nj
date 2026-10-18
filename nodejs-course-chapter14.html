@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>دوره Node.js — فصل ۱۴: Async Programming</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--border:#2a3347;--accent:#4ade80;--accent2:#22d3ee;--accent3:#a78bfa;--text:#e2e8f0;--text-muted:#8b9ab5;--text-dim:#4a5568;--code-bg:#0d1117}
+  body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;display:flex;min-height:100vh;overflow-x:hidden}
+  .sidebar{width:280px;min-width:280px;background:var(--bg2);border-left:1px solid var(--border);padding:2rem 0;position:fixed;right:0;top:0;height:100vh;overflow-y:auto;z-index:100}
+  .sidebar-logo{padding:0 1.5rem 1.5rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+  .sidebar-logo .logo-icon{width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem}
+  .sidebar-logo h2{font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px}
+  .sidebar-logo p{font-size:12px;color:var(--text-muted)}
+  .nav-section-title{font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;padding:0 1.5rem;margin:1.25rem 0 0.5rem}
+  .nav-item{display:flex;align-items:center;gap:0.6rem;padding:0.55rem 1.5rem;font-size:13px;color:var(--text-muted);cursor:pointer;border-right:3px solid transparent;transition:all 0.15s;text-decoration:none}
+  .nav-item:hover{background:var(--bg3);color:var(--text)}
+  .nav-item.active{background:rgba(74,222,128,0.08);color:var(--accent);border-right-color:var(--accent);font-weight:500}
+  .nav-item .num{font-size:11px;background:var(--bg3);border-radius:4px;padding:1px 6px;min-width:24px;text-align:center;font-family:'Fira Code',monospace}
+  .nav-item.active .num{background:rgba(74,222,128,0.15);color:var(--accent)}
+  .main{margin-right:280px;flex:1;padding:3rem 3.5rem 5rem;max-width:860px}
+  .chapter-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);border-radius:20px;padding:4px 14px;font-size:12px;color:var(--accent);margin-bottom:1rem;font-weight:500}
+  h1.chapter-title{font-size:2.2rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:0.75rem}
+  h1.chapter-title span{color:var(--accent)}
+  .chapter-desc{font-size:16px;color:var(--text-muted);margin-bottom:2.5rem;max-width:600px}
+  .divider{height:1px;background:var(--border);margin:2.5rem 0}
+  h2.section-title{font-size:1.25rem;font-weight:700;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;gap:10px}
+  h2.section-title::before{content:'';display:block;width:4px;height:22px;background:var(--accent);border-radius:2px}
+  h3.sub-title{font-size:1rem;font-weight:700;color:var(--accent2);margin:1.5rem 0 0.6rem}
+  p{color:var(--text-muted);font-size:15px;margin-bottom:1rem}
+  strong{color:var(--text);font-weight:600}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin:1rem 0}
+  .tag{font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;font-family:'Fira Code',monospace}
+  .tag.green{background:rgba(22,101,52,0.4);color:#86efac;border:1px solid rgba(134,239,172,0.2)}
+  .tag.blue{background:rgba(30,58,95,0.6);color:#7dd3fc;border:1px solid rgba(125,211,252,0.2)}
+  .tag.purple{background:rgba(59,31,110,0.6);color:#c4b5fd;border:1px solid rgba(196,181,253,0.2)}
+  .code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:12px;margin:1.25rem 0;overflow:hidden;direction:ltr}
+  .code-header{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 1rem;background:var(--bg3);border-bottom:1px solid var(--border);direction:ltr}
+  .code-header .dots{display:flex;gap:6px}
+  .code-header .dot{width:10px;height:10px;border-radius:50%}
+  .code-header .dot.red{background:#ff5f56}.code-header .dot.yellow{background:#ffbd2e}.code-header .dot.green{background:#27c93f}
+  .code-header .filename{font-size:12px;color:var(--text-muted);font-family:'Fira Code',monospace}
+  .code-body{padding:1.25rem 1.5rem;font-family:'Fira Code',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;white-space:pre;color:#e2e8f0;text-align:left;direction:ltr}
+  .c-comment{color:#6b7e99}.c-keyword{color:#c084fc}.c-string{color:#86efac}.c-fn{color:#67e8f9}.c-num{color:#fb923c}.c-op{color:#94a3b8}
+  .note-box{background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.25);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0;display:flex;gap:0.75rem}
+  .note-box p{color:var(--text-muted);font-size:14px;margin:0}
+  .note-box strong{color:var(--accent2)}
+  .warn-box{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0;display:flex;gap:0.75rem}
+  .warn-box p{color:var(--text-muted);font-size:14px;margin:0}
+  .warn-box strong{color:#fbbf24}
+  .explain-box{background:var(--bg2);border-right:3px solid var(--accent3);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin:1rem 0}
+  .explain-box p{font-size:14px;color:var(--text-muted);margin:0}
+  .explain-box strong{color:var(--accent3)}
+  .key-points{list-style:none;margin:1rem 0}
+  .key-points li{display:flex;gap:0.75rem;align-items:flex-start;margin-bottom:0.75rem;font-size:14px;color:var(--text-muted)}
+  .key-points li::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0;margin-top:2px}
+  .evolution{display:flex;flex-direction:column;gap:1rem;margin:1.5rem 0}
+  .evo-item{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.1rem;display:flex;gap:1rem;align-items:flex-start}
+  .evo-badge{background:var(--bg3);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;font-family:'Fira Code',monospace;white-space:nowrap;flex-shrink:0}
+  .evo-item h4{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+  .evo-item p{font-size:12px;color:var(--text-muted);margin:0}
+  .chapter-nav{display:flex;justify-content:space-between;margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border)}
+  .nav-btn{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:14px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;font-family:'Vazirmatn',sans-serif}
+  .nav-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .nav-btn.next{background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.3);color:var(--accent)}
+  
+
+  /* --- Fix: راست‌چین کردن کامنت‌های فارسی داخل بلوک کد --- */
+  .c-comment{unicode-bidi:isolate;direction:rtl}
+
+  /* --- Fix: ریسپانسیو کامل --- */
+  @media(max-width:1024px){
+    .main{margin-right:240px;padding:2rem}
+    .sidebar{width:240px;min-width:240px}
+  }
+  @media(max-width:900px){
+    body{display:block}
+    .main{margin-right:0;padding:1.25rem;max-width:100%}
+    h1.chapter-title{font-size:1.6rem}
+    .chapter-desc{font-size:14px}
+    /* Safety net: هر گرید یا فلکس چندستونه در موبایل تک‌ستونی و ایمن شود */
+    .compare-grid,.cg-card,.use-cases,.pattern-grid,.arch-grid,
+    .branch-grid,.cmd-grid,.range-grid,.module-compare,.pillar-grid,
+    .test-types,.ts-benefits,.compare-row,.error-types{grid-template-columns:1fr!important}
+    .semver-box,.di-diagram,.git-states,.tdd-cycle,.ws-clients,.flow-row{flex-wrap:wrap!important}
+    .git-state,.tdd-step{flex:1 1 100%!important;min-width:0!important}
+    .code-body{font-size:12px;padding:1rem}
+    .chapter-nav{flex-direction:column;gap:10px}
+    .nav-btn{width:100%;justify-content:center;text-align:center}
+    .tags{gap:6px}
+    .tag{font-size:11px;padding:3px 10px}
+  }
+  @media(max-width:480px){
+    .main{padding:1rem}
+    h1.chapter-title{font-size:1.35rem}
+    .code-body{font-size:11px;padding:0.75rem}
+    .code-header .filename{font-size:10px}
+    .chapter-badge{font-size:11px;padding:3px 10px}
+  }
+  /* دکمه‌های قبلی/بعدی حالا لینک هستند نه button - استایل یکسان بماند */
+  a.nav-btn{text-decoration:none}
+  a.nav-btn.disabled{opacity:0.4;pointer-events:none;cursor:default}
+
+  /* --- Fix: دکمه همبرگری و منوی موبایل --- */
+  .mobile-menu-btn{
+    display:none;
+    position:fixed;
+    top:16px;
+    right:16px;
+    z-index:200;
+    width:44px;
+    height:44px;
+    background:var(--bg2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+  }
+  .mobile-menu-btn svg{width:22px;height:22px;stroke:var(--accent)}
+  .mobile-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    z-index:150;
+  }
+  .mobile-overlay.open{display:block}
+
+  @media(max-width:900px){
+    .mobile-menu-btn{display:flex}
+    .sidebar{
+      display:flex!important;
+      flex-direction:column;
+      transform:translateX(100%);
+      transition:transform 0.25s ease;
+      z-index:180;
+      box-shadow:-4px 0 20px rgba(0,0,0,0.4);
+    }
+    .sidebar.open{transform:translateX(0)}
+    .main{padding-top:4.5rem}
+  }
+</style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="باز کردن منو">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+</button>
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0f1117" stroke-width="2.5" stroke-linecap="round" width="22" height="22"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+    <h2>دوره Node.js</h2><p>۶۳ فصل — مقدماتی تا پیشرفته</p>
+  </div>
+  <div class="nav-section-title">بخش مقدماتی</div>
+  <a class="nav-item" href="nodejs-course-chapter1.html"><span class="num">01</span> معماری و تاریخچه</a>
+  <a class="nav-item" href="nodejs-course-chapter2.html"><span class="num">02</span> توسعه روی Linux</a>
+  <a class="nav-item" href="nodejs-course-chapter3.html"><span class="num">03</span> NPM و ماژول‌ها</a>
+  <a class="nav-item" href="nodejs-course-chapter4.html"><span class="num">04</span> Semantic Versioning</a>
+  <a class="nav-item" href="nodejs-course-chapter5.html"><span class="num">05</span> Git Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter6.html"><span class="num">06</span> Git Flow</a>
+  <a class="nav-item" href="nodejs-course-chapter7.html"><span class="num">07</span> Github</a>
+  <a class="nav-item" href="nodejs-course-chapter8.html"><span class="num">08</span> Testing & TDD</a>
+  <a class="nav-item" href="nodejs-course-chapter9.html"><span class="num">09</span> JS Fundamentals</a>
+  <a class="nav-item" href="nodejs-course-chapter10.html"><span class="num">10</span> OOP</a>
+  <a class="nav-item" href="nodejs-course-chapter11.html"><span class="num">11</span> Advanced JS</a>
+  <a class="nav-item" href="nodejs-course-chapter12.html"><span class="num">12</span> TypeScript</a>
+  <a class="nav-item" href="nodejs-course-chapter13.html"><span class="num">13</span> Error Handling</a>
+  <a class="nav-item active" href="nodejs-course-chapter14.html"><span class="num">14</span> Async Programming</a>
+  <a class="nav-item" href="nodejs-course-chapter15.html"><span class="num">15</span> Non-Blocking & Concurrency</a>
+  <a class="nav-item" href="nodejs-course-chapter16.html"><span class="num">16</span> Async Flow Control</a>
+  <a class="nav-item" href="nodejs-course-chapter17.html"><span class="num">17</span> Web Server (Fastify)</a>
+  <a class="nav-item" href="nodejs-course-chapter18.html"><span class="num">18</span> Chat Server</a>
+  <a class="nav-item" href="nodejs-course-chapter19.html"><span class="num">19</span> Docker</a>
+  <a class="nav-item" href="nodejs-course-chapter20.html"><span class="num">20</span> MongoDB</a>
+  <a class="nav-item" href="nodejs-course-chapter21.html"><span class="num">21</span> Redis Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter22.html"><span class="num">22</span> Frameworks & IOC</a>
+  <a class="nav-item" href="nodejs-course-chapter23.html"><span class="num">23</span> NestJS</a>
+  <div class="nav-section-title">بخش پیشرفته</div>
+  <a class="nav-item" href="nodejs-course-chapter24.html"><span class="num">24</span> Currying & Composition</a>
+  <a class="nav-item" href="nodejs-course-chapter25.html"><span class="num">25</span> Isomorphic & Idempotent</a>
+  <a class="nav-item" href="nodejs-course-chapter26.html"><span class="num">26</span> Functional Data Modeling</a>
+  <a class="nav-item" href="nodejs-course-chapter27.html"><span class="num">27</span> Zod</a>
+  <a class="nav-item" href="nodejs-course-chapter28.html"><span class="num">28</span> SOLID</a>
+  <a class="nav-item" href="nodejs-course-chapter29.html"><span class="num">29</span> GoF Design Patterns</a>
+  <a class="nav-item" href="nodejs-course-chapter30.html"><span class="num">30</span> Refactoring</a>
+  <a class="nav-item" href="nodejs-course-chapter31.html"><span class="num">31</span> Event Emitter</a>
+  <a class="nav-item" href="nodejs-course-chapter32.html"><span class="num">32</span> Pub/Sub (Cluster)</a>
+  <a class="nav-item" href="nodejs-course-chapter33.html"><span class="num">33</span> Queues & Brokers</a>
+  <a class="nav-item" href="nodejs-course-chapter34.html"><span class="num">34</span> Working with Streams</a>
+  <a class="nav-item" href="nodejs-course-chapter35.html"><span class="num">35</span> Custom Streams & Generators</a>
+  <a class="nav-item" href="nodejs-course-chapter36.html"><span class="num">36</span> RxJS</a>
+  <a class="nav-item" href="nodejs-course-chapter37.html"><span class="num">37</span> 12 Factor App</a>
+  <a class="nav-item" href="nodejs-course-chapter38.html"><span class="num">38</span> Resilience Patterns</a>
+  <a class="nav-item" href="nodejs-course-chapter39.html"><span class="num">39</span> Postgres Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter40.html"><span class="num">40</span> TypeORM</a>
+  <a class="nav-item" href="nodejs-course-chapter41.html"><span class="num">41</span> TS: Thinking in Types</a>
+  <a class="nav-item" href="nodejs-course-chapter42.html"><span class="num">42</span> Web Frameworks Compare</a>
+  <a class="nav-item" href="nodejs-course-chapter43.html"><span class="num">43</span> Onion & Clean Architecture</a>
+  <a class="nav-item" href="nodejs-course-chapter44.html"><span class="num">44</span> Microservices Patterns</a>
+  <div class="nav-section-title">بخش تکمیلی</div>
+  <a class="nav-item" href="nodejs-course-chapter45.html"><span class="num">45</span> Authentication (JWT)</a>
+  <a class="nav-item" href="nodejs-course-chapter46.html"><span class="num">46</span> Authorization & RBAC</a>
+  <a class="nav-item" href="nodejs-course-chapter47.html"><span class="num">47</span> Security Essentials</a>
+  <a class="nav-item" href="nodejs-course-chapter48.html"><span class="num">48</span> Caching Strategies</a>
+  <a class="nav-item" href="nodejs-course-chapter49.html"><span class="num">49</span> API Design</a>
+  <a class="nav-item" href="nodejs-course-chapter50.html"><span class="num">50</span> Monitoring & Observability</a>
+  <a class="nav-item" href="nodejs-course-chapter51.html"><span class="num">51</span> Advanced Testing</a>
+  <a class="nav-item" href="nodejs-course-chapter52.html"><span class="num">52</span> Node.js Internals & Memory</a>
+  <a class="nav-item" href="nodejs-course-chapter53.html"><span class="num">53</span> Serverless (AWS Lambda)</a>
+  <a class="nav-item" href="nodejs-course-chapter54.html"><span class="num">54</span> CI/CD Pipeline کامل</a>
+  <div class="nav-section-title">بخش عملی نهایی</div>
+  <a class="nav-item" href="nodejs-course-chapter55.html"><span class="num">55</span> PM2 & Process Management</a>
+  <a class="nav-item" href="nodejs-course-chapter56.html"><span class="num">56</span> File Upload & Streaming</a>
+  <a class="nav-item" href="nodejs-course-chapter57.html"><span class="num">57</span> Webhooks</a>
+  <a class="nav-item" href="nodejs-course-chapter58.html"><span class="num">58</span> Cron & Scheduled Tasks</a>
+  <a class="nav-item" href="nodejs-course-chapter59.html"><span class="num">59</span> npm Monorepo & Workspaces</a>
+  <a class="nav-item" href="nodejs-course-chapter60.html"><span class="num">60</span> Config Validation & Feature Flags</a>
+  <a class="nav-item" href="nodejs-course-chapter61.html"><span class="num">61</span> gRPC</a>
+  <div class="nav-section-title">تمرکز ویژه مصاحبه</div>
+  <a class="nav-item" href="nodejs-course-chapter62.html"><span class="num">62</span> Express.js عمیق</a>
+  <a class="nav-item" href="nodejs-course-chapter63.html"><span class="num">63</span> NestJS پیشرفته</a>
+  <a class="nav-item" href="nodejs-course-chapter64.html"><span class="num">64</span> OOP کامل و Decorators</a>
+</aside>
+
+<main class="main">
+  <div class="chapter-badge"><span>●</span> فصل چهاردهم</div>
+  <h1 class="chapter-title">Async<br/><span>Programming</span></h1>
+  <p class="chapter-desc">
+    برنامه‌نویسی ناهمزمان قلب Node.js است. یاد می‌گیریم سه روشی که
+    JavaScript برای کار با async ارائه می‌دهد: Callback، Promise و async/await —
+    و تفاوت‌ها، مشکلات و بهترین روش هر کدام.
+  </p>
+  <div class="tags">
+    <span class="tag green">Callback</span>
+    <span class="tag blue">Promise</span>
+    <span class="tag purple">async/await</span>
+    <span class="tag green">Promise.all</span>
+    <span class="tag blue">Error handling</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">چرا Async در Node.js اهمیت دارد؟</h2>
+  <p>
+    در Node.js اکثر کارها I/O هستند: خواندن فایل، query به database، call به API خارجی.
+    همه این کارها <strong>زمان می‌برند</strong>. اگر منتظر هر کدام بمانیم (blocking)،
+    در آن مدت هیچ درخواست دیگری نمی‌توانیم پاسخ دهیم.
+    Async programming به ما اجازه می‌دهد این کارها را <strong>بدون مسدود کردن thread</strong> انجام دهیم.
+  </p>
+
+  <div class="explain-box">
+    <p><strong>تشبیه رستوران:</strong> یک گارسون (thread) می‌تواند ده میز را سرویس دهد. بعد از گرفتن سفارش میز اول، می‌رود میز دوم را می‌گیرد — منتظر نمی‌ماند غذا آماده شود. وقتی غذا آماده شد، برمی‌گردد. این async است.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">تکامل Async در JavaScript</h2>
+
+  <div class="evolution">
+    <div class="evo-item">
+      <div class="evo-badge" style="color:#fb923c">ES5</div>
+      <div>
+        <h4>Callback — روش اول (قدیمی)</h4>
+        <p>تابعی که بعد از تمام شدن کار async صدا زده می‌شود. منجر به "Callback Hell" می‌شود.</p>
+      </div>
+    </div>
+    <div class="evo-item">
+      <div class="evo-badge" style="color:#fbbf24">ES6</div>
+      <div>
+        <h4>Promise — روش دوم (بهتر)</h4>
+        <p>یک object که نمایانگر نتیجه آینده است. زنجیر کردن با .then() کد را تمیزتر می‌کند.</p>
+      </div>
+    </div>
+    <div class="evo-item">
+      <div class="evo-badge" style="color:var(--accent)">ES2017</div>
+      <div>
+        <h4>async/await — روش سوم (بهترین)</h4>
+        <p>Syntax شکر روی Promise. کد async را مثل sync می‌نویسید — خواناترین روش.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">روش اول: Callback</h2>
+  <p>
+    <strong>Callback</strong> یک تابع است که به عنوان آرگومان به تابع دیگری می‌دهید
+    تا بعد از تمام شدن کار async صدا زده شود.
+    در Node.js قراردادی وجود دارد که اول پارامتر error است، بعد نتیجه — به این <strong>error-first callback</strong> می‌گویند.
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">callback-pattern.js</span></div>
+    <div class="code-body"><span class="c-keyword">const</span> fs = <span class="c-fn">require</span>(<span class="c-string">'fs'</span>);
+
+<span class="c-comment">// الگوی error-first callback در Node.js
+// اول err، بعد نتیجه — این قرارداد است</span>
+fs.<span class="c-fn">readFile</span>(<span class="c-string">'data.txt'</span>, <span class="c-string">'utf8'</span>, (err, data) => {
+  <span class="c-keyword">if</span> (err) {
+    console.<span class="c-fn">error</span>(<span class="c-string">'خطا در خواندن فایل:'</span>, err.message);
+    <span class="c-keyword">return</span>; <span class="c-comment">// اجرا متوقف می‌شود</span>
+  }
+  console.<span class="c-fn">log</span>(<span class="c-string">'محتوای فایل:'</span>, data);
+});
+
+console.<span class="c-fn">log</span>(<span class="c-string">'این قبل از خواندن فایل اجرا می‌شود'</span>);
+
+<span class="c-comment">// مشکل — Callback Hell (جهنم callback)</span>
+<span class="c-comment">// وقتی چند کار async به هم وابسته هستند:</span>
+fs.<span class="c-fn">readFile</span>(<span class="c-string">'users.json'</span>, <span class="c-string">'utf8'</span>, (err, usersData) => {
+  <span class="c-keyword">if</span> (err) <span class="c-keyword">return</span> console.<span class="c-fn">error</span>(err);
+  <span class="c-keyword">const</span> users = JSON.<span class="c-fn">parse</span>(usersData);
+
+  db.<span class="c-fn">findUser</span>(users[<span class="c-num">0</span>].id, (err, user) => {
+    <span class="c-keyword">if</span> (err) <span class="c-keyword">return</span> console.<span class="c-fn">error</span>(err);
+
+    emailService.<span class="c-fn">send</span>(user.email, <span class="c-string">'Welcome!'</span>, (err, result) => {
+      <span class="c-keyword">if</span> (err) <span class="c-keyword">return</span> console.<span class="c-fn">error</span>(err);
+      console.<span class="c-fn">log</span>(<span class="c-string">'ایمیل ارسال شد'</span>);
+      <span class="c-comment">// اگر کار دیگری هم بود، indent بیشتری می‌شد — Callback Hell!</span>
+    });
+  });
+});</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">روش دوم: Promise</h2>
+  <p>
+    <strong>Promise</strong> یک object است که نمایانگر نتیجه آینده یک کار async است.
+    سه حالت دارد: <strong>pending</strong> (در انتظار)، <strong>fulfilled</strong> (موفق) و <strong>rejected</strong> (ناموفق).
+    با <code>.then()</code> نتیجه موفق و با <code>.catch()</code> خطا را می‌گیرید.
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">promise-basics.js</span></div>
+    <div class="code-body"><span class="c-comment">// ساخت یک Promise</span>
+<span class="c-keyword">function</span> <span class="c-fn">delay</span>(ms) {
+  <span class="c-keyword">return new</span> <span class="c-fn">Promise</span>((resolve, reject) => {
+    <span class="c-comment">// resolve = موفق، reject = ناموفق</span>
+    <span class="c-fn">setTimeout</span>(() => <span class="c-fn">resolve</span>(<span class="c-string">'تمام شد!'</span>), ms);
+  });
+}
+
+<span class="c-comment">// استفاده از Promise با .then/.catch</span>
+<span class="c-fn">delay</span>(<span class="c-num">1000</span>)
+  .<span class="c-fn">then</span>(result => {
+    console.<span class="c-fn">log</span>(result); <span class="c-comment">// تمام شد!</span>
+    <span class="c-keyword">return</span> <span class="c-fn">delay</span>(<span class="c-num">500</span>); <span class="c-comment">// می‌توانیم Promise جدید برگردانیم</span>
+  })
+  .<span class="c-fn">then</span>(result => {
+    console.<span class="c-fn">log</span>(<span class="c-string">'دوباره تمام شد!'</span>);
+  })
+  .<span class="c-fn">catch</span>(error => {
+    console.<span class="c-fn">error</span>(<span class="c-string">'خطا:'</span>, error);
+  })
+  .<span class="c-fn">finally</span>(() => {
+    console.<span class="c-fn">log</span>(<span class="c-string">'همیشه اجرا می‌شود'</span>);
+  });
+
+<span class="c-comment">// مثال واقعی — fetch از API</span>
+<span class="c-keyword">function</span> <span class="c-fn">getUser</span>(id) {
+  <span class="c-keyword">return</span> <span class="c-fn">fetch</span>(<span class="c-string">`/api/users/${id}`</span>)
+    .<span class="c-fn">then</span>(response => {
+      <span class="c-keyword">if</span> (!response.ok) <span class="c-keyword">throw new</span> <span class="c-fn">Error</span>(<span class="c-string">'User not found'</span>);
+      <span class="c-keyword">return</span> response.<span class="c-fn">json</span>();
+    })
+    .<span class="c-fn">then</span>(user => {
+      console.<span class="c-fn">log</span>(<span class="c-string">'کاربر:'</span>, user.name);
+      <span class="c-keyword">return</span> user;
+    });
+}</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">روش سوم: async/await — بهترین روش</h2>
+  <p>
+    <strong>async/await</strong> روی Promise ساخته شده — در واقع یک syntax شکر است.
+    کد async را مثل کد sync می‌نویسید که خیلی خواناتر است.
+    <code>async</code> تابع را Promise برگردان می‌کند.
+    <code>await</code> منتظر می‌ماند تا Promise تمام شود.
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">async-await.js</span></div>
+    <div class="code-body"><span class="c-comment">// همان مثال قبل با async/await — خیلی تمیزتر</span>
+<span class="c-keyword">async function</span> <span class="c-fn">processUser</span>(userId) {
+  <span class="c-keyword">try</span> {
+    <span class="c-comment">// await منتظر Promise می‌ماند بدون block کردن thread</span>
+    <span class="c-keyword">const</span> user = <span class="c-keyword">await</span> db.<span class="c-fn">findUser</span>(userId);
+    <span class="c-keyword">if</span> (!user) <span class="c-keyword">throw new</span> <span class="c-fn">Error</span>(<span class="c-string">'کاربر پیدا نشد'</span>);
+
+    <span class="c-keyword">const</span> orders = <span class="c-keyword">await</span> db.<span class="c-fn">findOrdersByUser</span>(user.id);
+    <span class="c-keyword">const</span> emailResult = <span class="c-keyword">await</span> emailService.<span class="c-fn">send</span>(user.email, <span class="c-string">'خلاصه سفارشات'</span>);
+
+    console.<span class="c-fn">log</span>(<span class="c-string">`${orders.length} سفارش به ${user.email} ارسال شد`</span>);
+    <span class="c-keyword">return</span> { user, orders };
+
+  } <span class="c-keyword">catch</span> (error) {
+    console.<span class="c-fn">error</span>(<span class="c-string">'خطا در پردازش کاربر:'</span>, error.message);
+    <span class="c-keyword">throw</span> error; <span class="c-comment">// دوباره throw کنید تا caller بداند</span>
+  }
+}
+
+<span class="c-comment">// صدا زدن async function</span>
+<span class="c-fn">processUser</span>(<span class="c-string">'user-123'</span>)
+  .<span class="c-fn">then</span>(result => console.<span class="c-fn">log</span>(<span class="c-string">'موفق:'</span>, result))
+  .<span class="c-fn">catch</span>(err => console.<span class="c-fn">error</span>(<span class="c-string">'ناموفق:'</span>, err.message));</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Promise.all — کارهای موازی</h2>
+  <p>
+    گاهی چند کار async دارید که به هم وابسته نیستند.
+    اگر آن‌ها را یکی یکی await کنید، وقت تلف می‌شود.
+    <strong>Promise.all</strong> همه را <strong>همزمان</strong> اجرا می‌کند و منتظر می‌ماند همه تمام شوند:
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">promise-all.js</span></div>
+    <div class="code-body"><span class="c-comment">// ❌ روش اشتباه — ۳ ثانیه طول می‌کشد (۱+۱+۱)</span>
+<span class="c-keyword">async function</span> <span class="c-fn">slowWay</span>() {
+  <span class="c-keyword">const</span> user    = <span class="c-keyword">await</span> <span class="c-fn">getUser</span>(<span class="c-num">1</span>);    <span class="c-comment">// 1 ثانیه منتظر</span>
+  <span class="c-keyword">const</span> orders  = <span class="c-keyword">await</span> <span class="c-fn">getOrders</span>(<span class="c-num">1</span>); <span class="c-comment">// 1 ثانیه منتظر</span>
+  <span class="c-keyword">const</span> reviews = <span class="c-keyword">await</span> <span class="c-fn">getReviews</span>(<span class="c-num">1</span>);<span class="c-comment">// 1 ثانیه منتظر</span>
+  <span class="c-comment">// مجموع: 3 ثانیه</span>
+}
+
+<span class="c-comment">// ✅ روش درست — فقط ۱ ثانیه (هر سه موازی اجرا می‌شوند)</span>
+<span class="c-keyword">async function</span> <span class="c-fn">fastWay</span>() {
+  <span class="c-keyword">const</span> [user, orders, reviews] = <span class="c-keyword">await</span> Promise.<span class="c-fn">all</span>([
+    <span class="c-fn">getUser</span>(<span class="c-num">1</span>),
+    <span class="c-fn">getOrders</span>(<span class="c-num">1</span>),
+    <span class="c-fn">getReviews</span>(<span class="c-num">1</span>)
+  ]);
+  <span class="c-comment">// مجموع: فقط 1 ثانیه — هر سه موازی اجرا شدند</span>
+  console.<span class="c-fn">log</span>(user.name, orders.length, reviews.length);
+}
+
+<span class="c-comment">// Promise.allSettled — اگر بعضی fail شوند مشکلی نیست</span>
+<span class="c-keyword">async function</span> <span class="c-fn">safeParallel</span>() {
+  <span class="c-keyword">const</span> results = <span class="c-keyword">await</span> Promise.<span class="c-fn">allSettled</span>([
+    <span class="c-fn">getUser</span>(<span class="c-num">1</span>),
+    <span class="c-fn">getUser</span>(<span class="c-num">999</span>),  <span class="c-comment">// این ممکن است fail شود</span>
+    <span class="c-fn">getOrders</span>(<span class="c-num">1</span>)
+  ]);
+
+  results.<span class="c-fn">forEach</span>((result, i) => {
+    <span class="c-keyword">if</span> (result.status === <span class="c-string">'fulfilled'</span>) {
+      console.<span class="c-fn">log</span>(<span class="c-string">`نتیجه ${i}:`</span>, result.value);
+    } <span class="c-keyword">else</span> {
+      console.<span class="c-fn">error</span>(<span class="c-string">`خطا ${i}:`</span>, result.reason.message);
+    }
+  });
+}
+
+<span class="c-comment">// Promise.race — اولین نتیجه را می‌گیرد (برای timeout مفید)</span>
+<span class="c-keyword">async function</span> <span class="c-fn">withTimeout</span>(promise, ms) {
+  <span class="c-keyword">const</span> timeout = <span class="c-keyword">new</span> <span class="c-fn">Promise</span>((_, reject) =>
+    <span class="c-fn">setTimeout</span>(() => <span class="c-fn">reject</span>(<span class="c-keyword">new</span> <span class="c-fn">Error</span>(<span class="c-string">'Timeout!'</span>)), ms)
+  );
+  <span class="c-keyword">return</span> Promise.<span class="c-fn">race</span>([promise, timeout]);
+}</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">نکات کلیدی برای مصاحبه</h2>
+  <ul class="key-points">
+    <li><strong>Callback</strong> قدیمی است ولی هنوز در Node.js core APIs مثل fs دیده می‌شود. الگوی error-first را بدانید.</li>
+    <li><strong>Promise</strong> سه حالت دارد: pending، fulfilled، rejected. بعد از resolve یا reject تغییر نمی‌کند.</li>
+    <li><strong>async/await</strong> روی Promise ساخته شده — هر async function یک Promise برمی‌گرداند.</li>
+    <li>همیشه <strong>await</strong> را در <strong>try/catch</strong> بپیچید — خطاهای Promise با await مثل خطاهای sync می‌شوند.</li>
+    <li><strong>Promise.all</strong> وقتی کارها مستقل از هم هستند — موازی اجرا می‌کند و سریع‌تر است.</li>
+    <li><strong>Promise.allSettled</strong> وقتی می‌خواهید همه نتایج را داشته باشید حتی اگر بعضی fail شوند.</li>
+    <li>سوال رایج: «چرا Promise.all بهتر از چند await پشت سر هم است؟» — چند await جدا یعنی هر کدام منتظر قبلی می‌ماند (ترتیبی)؛ Promise.all همه را همزمان شروع می‌کند، پس اگر مستقل باشند، خیلی سریع‌تر تمام می‌شود.</li>
+    <li>یک تله رایج: در حلقه از <code>forEach</code> با async استفاده کردن — forEach منتظر Promiseها نمی‌ماند؛ برای اجرای ترتیبی باید از <code>for...of</code> با await استفاده کرد.</li>
+    <li><strong>Promise.race</strong> اولین Promise‌ای که تمام شود (چه موفق چه ناموفق) را برمی‌گرداند — کاربرد رایج: پیاده‌سازی timeout برای یک درخواست.</li>
+    <li>error-first callback یعنی اولین پارامتر callback همیشه خطا است (یا null اگر خطایی نبود) — قرارداد قدیمی Node.js قبل از رواج Promise.</li>
+  </ul>
+
+  <div class="chapter-nav">
+    <a class="nav-btn" href="nodejs-course-chapter13.html">← فصل قبلی: Error Handling</a>
+    <a class="nav-btn next" href="nodejs-course-chapter15.html">فصل بعدی: Non-Blocking & Concurrency →</a>
+  </div>
+</main>
+<script>
+function toggleMobileMenu(){
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('open');
+}
+// بستن منو با کلیک روی هر لینک فصل (تجربه بهتر در موبایل)
+document.querySelectorAll('.sidebar .nav-item').forEach(function(link){
+  link.addEventListener('click', function(){
+    document.querySelector('.sidebar').classList.remove('open');
+    document.getElementById('mobileOverlay').classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>

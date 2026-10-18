@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>دوره Node.js — فصل ۱۳: Error Handling</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--border:#2a3347;--accent:#4ade80;--accent2:#22d3ee;--accent3:#a78bfa;--text:#e2e8f0;--text-muted:#8b9ab5;--text-dim:#4a5568;--code-bg:#0d1117}
+  body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;display:flex;min-height:100vh;overflow-x:hidden}
+  .sidebar{width:280px;min-width:280px;background:var(--bg2);border-left:1px solid var(--border);padding:2rem 0;position:fixed;right:0;top:0;height:100vh;overflow-y:auto;z-index:100}
+  .sidebar-logo{padding:0 1.5rem 1.5rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+  .sidebar-logo .logo-icon{width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem}
+  .sidebar-logo h2{font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px}
+  .sidebar-logo p{font-size:12px;color:var(--text-muted)}
+  .nav-section-title{font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;padding:0 1.5rem;margin:1.25rem 0 0.5rem}
+  .nav-item{display:flex;align-items:center;gap:0.6rem;padding:0.55rem 1.5rem;font-size:13px;color:var(--text-muted);cursor:pointer;border-right:3px solid transparent;transition:all 0.15s;text-decoration:none}
+  .nav-item:hover{background:var(--bg3);color:var(--text)}
+  .nav-item.active{background:rgba(74,222,128,0.08);color:var(--accent);border-right-color:var(--accent);font-weight:500}
+  .nav-item .num{font-size:11px;background:var(--bg3);border-radius:4px;padding:1px 6px;min-width:24px;text-align:center;font-family:'Fira Code',monospace}
+  .nav-item.active .num{background:rgba(74,222,128,0.15);color:var(--accent)}
+  .main{margin-right:280px;flex:1;padding:3rem 3.5rem 5rem;max-width:860px}
+  .chapter-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);border-radius:20px;padding:4px 14px;font-size:12px;color:var(--accent);margin-bottom:1rem;font-weight:500}
+  h1.chapter-title{font-size:2.2rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:0.75rem}
+  h1.chapter-title span{color:var(--accent)}
+  .chapter-desc{font-size:16px;color:var(--text-muted);margin-bottom:2.5rem;max-width:600px}
+  .divider{height:1px;background:var(--border);margin:2.5rem 0}
+  h2.section-title{font-size:1.25rem;font-weight:700;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;gap:10px}
+  h2.section-title::before{content:'';display:block;width:4px;height:22px;background:var(--accent);border-radius:2px}
+  h3.sub-title{font-size:1rem;font-weight:700;color:var(--accent2);margin:1.5rem 0 0.6rem}
+  p{color:var(--text-muted);font-size:15px;margin-bottom:1rem}
+  strong{color:var(--text);font-weight:600}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin:1rem 0}
+  .tag{font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;font-family:'Fira Code',monospace}
+  .tag.green{background:rgba(22,101,52,0.4);color:#86efac;border:1px solid rgba(134,239,172,0.2)}
+  .tag.blue{background:rgba(30,58,95,0.6);color:#7dd3fc;border:1px solid rgba(125,211,252,0.2)}
+  .tag.purple{background:rgba(59,31,110,0.6);color:#c4b5fd;border:1px solid rgba(196,181,253,0.2)}
+  .tag.red{background:rgba(127,29,29,0.4);color:#fca5a5;border:1px solid rgba(252,165,165,0.2)}
+  .code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:12px;margin:1.25rem 0;overflow:hidden;direction:ltr}
+  .code-header{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 1rem;background:var(--bg3);border-bottom:1px solid var(--border);direction:ltr}
+  .code-header .dots{display:flex;gap:6px}
+  .code-header .dot{width:10px;height:10px;border-radius:50%}
+  .code-header .dot.red{background:#ff5f56}.code-header .dot.yellow{background:#ffbd2e}.code-header .dot.green{background:#27c93f}
+  .code-header .filename{font-size:12px;color:var(--text-muted);font-family:'Fira Code',monospace}
+  .code-body{padding:1.25rem 1.5rem;font-family:'Fira Code',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;white-space:pre;color:#e2e8f0;text-align:left;direction:ltr}
+  .c-comment{color:#6b7e99}.c-keyword{color:#c084fc}.c-string{color:#86efac}.c-fn{color:#67e8f9}.c-num{color:#fb923c}.c-op{color:#94a3b8}.c-type{color:#fbbf24}
+  .note-box{background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.25);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0;display:flex;gap:0.75rem}
+  .note-box p{color:var(--text-muted);font-size:14px;margin:0}
+  .note-box strong{color:var(--accent2)}
+  .warn-box{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0;display:flex;gap:0.75rem}
+  .warn-box p{color:var(--text-muted);font-size:14px;margin:0}
+  .warn-box strong{color:#fbbf24}
+  .error-box{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0;display:flex;gap:0.75rem}
+  .error-box p{color:var(--text-muted);font-size:14px;margin:0}
+  .error-box strong{color:#fca5a5}
+  .explain-box{background:var(--bg2);border-right:3px solid var(--accent3);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin:1rem 0}
+  .explain-box p{font-size:14px;color:var(--text-muted);margin:0}
+  .explain-box strong{color:var(--accent3)}
+  .key-points{list-style:none;margin:1rem 0}
+  .key-points li{display:flex;gap:0.75rem;align-items:flex-start;margin-bottom:0.75rem;font-size:14px;color:var(--text-muted)}
+  .key-points li::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0;margin-top:2px}
+  .error-types{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
+  .error-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem}
+  .error-card h4{font-size:13px;font-weight:700;margin-bottom:6px;font-family:'Fira Code',monospace}
+  .error-card p{font-size:12px;color:var(--text-muted);margin:0}
+  .chapter-nav{display:flex;justify-content:space-between;margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border)}
+  .nav-btn{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:14px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;font-family:'Vazirmatn',sans-serif}
+  .nav-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .nav-btn.next{background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.3);color:var(--accent)}
+  
+
+  /* --- Fix: ریسپانسیو کامل --- */
+  @media(max-width:1024px){
+    .main{margin-right:240px;padding:2rem}
+    .sidebar{width:240px;min-width:240px}
+  }
+  @media(max-width:900px){
+    body{display:block}
+    .main{margin-right:0;padding:1.25rem;max-width:100%}
+    h1.chapter-title{font-size:1.6rem}
+    .chapter-desc{font-size:14px}
+    /* Safety net: هر گرید یا فلکس چندستونه در موبایل تک‌ستونی و ایمن شود */
+    .compare-grid,.cg-card,.use-cases,.pattern-grid,.arch-grid,
+    .branch-grid,.cmd-grid,.range-grid,.module-compare,.pillar-grid,
+    .test-types,.ts-benefits,.compare-row,.error-types{grid-template-columns:1fr!important}
+    .semver-box,.di-diagram,.git-states,.tdd-cycle,.ws-clients,.flow-row{flex-wrap:wrap!important}
+    .git-state,.tdd-step{flex:1 1 100%!important;min-width:0!important}
+    .code-body{font-size:12px;padding:1rem}
+    .chapter-nav{flex-direction:column;gap:10px}
+    .nav-btn{width:100%;justify-content:center;text-align:center}
+    .tags{gap:6px}
+    .tag{font-size:11px;padding:3px 10px}
+  }
+  @media(max-width:480px){
+    .main{padding:1rem}
+    h1.chapter-title{font-size:1.35rem}
+    .code-body{font-size:11px;padding:0.75rem}
+    .code-header .filename{font-size:10px}
+    .chapter-badge{font-size:11px;padding:3px 10px}
+  }
+  /* دکمه‌های قبلی/بعدی حالا لینک هستند نه button - استایل یکسان بماند */
+  a.nav-btn{text-decoration:none}
+  a.nav-btn.disabled{opacity:0.4;pointer-events:none;cursor:default}
+
+  /* --- Fix: دکمه همبرگری و منوی موبایل --- */
+  .mobile-menu-btn{
+    display:none;
+    position:fixed;
+    top:16px;
+    right:16px;
+    z-index:200;
+    width:44px;
+    height:44px;
+    background:var(--bg2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+  }
+  .mobile-menu-btn svg{width:22px;height:22px;stroke:var(--accent)}
+  .mobile-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    z-index:150;
+  }
+  .mobile-overlay.open{display:block}
+
+  @media(max-width:900px){
+    .mobile-menu-btn{display:flex}
+    .sidebar{
+      display:flex!important;
+      flex-direction:column;
+      transform:translateX(100%);
+      transition:transform 0.25s ease;
+      z-index:180;
+      box-shadow:-4px 0 20px rgba(0,0,0,0.4);
+    }
+    .sidebar.open{transform:translateX(0)}
+    .main{padding-top:4.5rem}
+  }
+</style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="باز کردن منو">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+</button>
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0f1117" stroke-width="2.5" stroke-linecap="round" width="22" height="22"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+    <h2>دوره Node.js</h2><p>۶۳ فصل — مقدماتی تا پیشرفته</p>
+  </div>
+  <div class="nav-section-title">بخش مقدماتی</div>
+  <a class="nav-item" href="nodejs-course-chapter1.html"><span class="num">01</span> معماری و تاریخچه</a>
+  <a class="nav-item" href="nodejs-course-chapter2.html"><span class="num">02</span> توسعه روی Linux</a>
+  <a class="nav-item" href="nodejs-course-chapter3.html"><span class="num">03</span> NPM و ماژول‌ها</a>
+  <a class="nav-item" href="nodejs-course-chapter4.html"><span class="num">04</span> Semantic Versioning</a>
+  <a class="nav-item" href="nodejs-course-chapter5.html"><span class="num">05</span> Git Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter6.html"><span class="num">06</span> Git Flow</a>
+  <a class="nav-item" href="nodejs-course-chapter7.html"><span class="num">07</span> Github</a>
+  <a class="nav-item" href="nodejs-course-chapter8.html"><span class="num">08</span> Testing & TDD</a>
+  <a class="nav-item" href="nodejs-course-chapter9.html"><span class="num">09</span> JS Fundamentals</a>
+  <a class="nav-item" href="nodejs-course-chapter10.html"><span class="num">10</span> OOP</a>
+  <a class="nav-item" href="nodejs-course-chapter11.html"><span class="num">11</span> Advanced JS</a>
+  <a class="nav-item" href="nodejs-course-chapter12.html"><span class="num">12</span> TypeScript</a>
+  <a class="nav-item active" href="nodejs-course-chapter13.html"><span class="num">13</span> Error Handling</a>
+  <a class="nav-item" href="nodejs-course-chapter14.html"><span class="num">14</span> Async Programming</a>
+  <a class="nav-item" href="nodejs-course-chapter15.html"><span class="num">15</span> Non-Blocking & Concurrency</a>
+  <a class="nav-item" href="nodejs-course-chapter16.html"><span class="num">16</span> Async Flow Control</a>
+  <a class="nav-item" href="nodejs-course-chapter17.html"><span class="num">17</span> Web Server (Fastify)</a>
+  <a class="nav-item" href="nodejs-course-chapter18.html"><span class="num">18</span> Chat Server</a>
+  <a class="nav-item" href="nodejs-course-chapter19.html"><span class="num">19</span> Docker</a>
+  <a class="nav-item" href="nodejs-course-chapter20.html"><span class="num">20</span> MongoDB</a>
+  <a class="nav-item" href="nodejs-course-chapter21.html"><span class="num">21</span> Redis Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter22.html"><span class="num">22</span> Frameworks & IOC</a>
+  <a class="nav-item" href="nodejs-course-chapter23.html"><span class="num">23</span> NestJS</a>
+  <div class="nav-section-title">بخش پیشرفته</div>
+  <a class="nav-item" href="nodejs-course-chapter24.html"><span class="num">24</span> Currying & Composition</a>
+  <a class="nav-item" href="nodejs-course-chapter25.html"><span class="num">25</span> Isomorphic & Idempotent</a>
+  <a class="nav-item" href="nodejs-course-chapter26.html"><span class="num">26</span> Functional Data Modeling</a>
+  <a class="nav-item" href="nodejs-course-chapter27.html"><span class="num">27</span> Zod</a>
+  <a class="nav-item" href="nodejs-course-chapter28.html"><span class="num">28</span> SOLID</a>
+  <a class="nav-item" href="nodejs-course-chapter29.html"><span class="num">29</span> GoF Design Patterns</a>
+  <a class="nav-item" href="nodejs-course-chapter30.html"><span class="num">30</span> Refactoring</a>
+  <a class="nav-item" href="nodejs-course-chapter31.html"><span class="num">31</span> Event Emitter</a>
+  <a class="nav-item" href="nodejs-course-chapter32.html"><span class="num">32</span> Pub/Sub (Cluster)</a>
+  <a class="nav-item" href="nodejs-course-chapter33.html"><span class="num">33</span> Queues & Brokers</a>
+  <a class="nav-item" href="nodejs-course-chapter34.html"><span class="num">34</span> Working with Streams</a>
+  <a class="nav-item" href="nodejs-course-chapter35.html"><span class="num">35</span> Custom Streams & Generators</a>
+  <a class="nav-item" href="nodejs-course-chapter36.html"><span class="num">36</span> RxJS</a>
+  <a class="nav-item" href="nodejs-course-chapter37.html"><span class="num">37</span> 12 Factor App</a>
+  <a class="nav-item" href="nodejs-course-chapter38.html"><span class="num">38</span> Resilience Patterns</a>
+  <a class="nav-item" href="nodejs-course-chapter39.html"><span class="num">39</span> Postgres Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter40.html"><span class="num">40</span> TypeORM</a>
+  <a class="nav-item" href="nodejs-course-chapter41.html"><span class="num">41</span> TS: Thinking in Types</a>
+  <a class="nav-item" href="nodejs-course-chapter42.html"><span class="num">42</span> Web Frameworks Compare</a>
+  <a class="nav-item" href="nodejs-course-chapter43.html"><span class="num">43</span> Onion & Clean Architecture</a>
+  <a class="nav-item" href="nodejs-course-chapter44.html"><span class="num">44</span> Microservices Patterns</a>
+  <div class="nav-section-title">بخش تکمیلی</div>
+  <a class="nav-item" href="nodejs-course-chapter45.html"><span class="num">45</span> Authentication (JWT)</a>
+  <a class="nav-item" href="nodejs-course-chapter46.html"><span class="num">46</span> Authorization & RBAC</a>
+  <a class="nav-item" href="nodejs-course-chapter47.html"><span class="num">47</span> Security Essentials</a>
+  <a class="nav-item" href="nodejs-course-chapter48.html"><span class="num">48</span> Caching Strategies</a>
+  <a class="nav-item" href="nodejs-course-chapter49.html"><span class="num">49</span> API Design</a>
+  <a class="nav-item" href="nodejs-course-chapter50.html"><span class="num">50</span> Monitoring & Observability</a>
+  <a class="nav-item" href="nodejs-course-chapter51.html"><span class="num">51</span> Advanced Testing</a>
+  <a class="nav-item" href="nodejs-course-chapter52.html"><span class="num">52</span> Node.js Internals & Memory</a>
+  <a class="nav-item" href="nodejs-course-chapter53.html"><span class="num">53</span> Serverless (AWS Lambda)</a>
+  <a class="nav-item" href="nodejs-course-chapter54.html"><span class="num">54</span> CI/CD Pipeline کامل</a>
+  <div class="nav-section-title">بخش عملی نهایی</div>
+  <a class="nav-item" href="nodejs-course-chapter55.html"><span class="num">55</span> PM2 & Process Management</a>
+  <a class="nav-item" href="nodejs-course-chapter56.html"><span class="num">56</span> File Upload & Streaming</a>
+  <a class="nav-item" href="nodejs-course-chapter57.html"><span class="num">57</span> Webhooks</a>
+  <a class="nav-item" href="nodejs-course-chapter58.html"><span class="num">58</span> Cron & Scheduled Tasks</a>
+  <a class="nav-item" href="nodejs-course-chapter59.html"><span class="num">59</span> npm Monorepo & Workspaces</a>
+  <a class="nav-item" href="nodejs-course-chapter60.html"><span class="num">60</span> Config Validation & Feature Flags</a>
+  <a class="nav-item" href="nodejs-course-chapter61.html"><span class="num">61</span> gRPC</a>
+  <div class="nav-section-title">تمرکز ویژه مصاحبه</div>
+  <a class="nav-item" href="nodejs-course-chapter62.html"><span class="num">62</span> Express.js عمیق</a>
+  <a class="nav-item" href="nodejs-course-chapter63.html"><span class="num">63</span> NestJS پیشرفته</a>
+  <a class="nav-item" href="nodejs-course-chapter64.html"><span class="num">64</span> OOP کامل و Decorators</a>
+</aside>
+
+<main class="main">
+  <div class="chapter-badge"><span>●</span> فصل سیزدهم</div>
+  <h1 class="chapter-title">Error<br/><span>Handling</span></h1>
+  <p class="chapter-desc">
+    در دنیای واقعی همیشه چیزی می‌تواند اشتباه برود — database وصل نمی‌شود،
+    فایل پیدا نمی‌شود، کاربر داده اشتباه می‌فرستد. یاد می‌گیریم چطور خطاها را
+    به درستی مدیریت کنیم تا برنامه crash نکند و پیام مناسب به کاربر بدهیم.
+  </p>
+  <div class="tags">
+    <span class="tag red">try/catch</span>
+    <span class="tag blue">Error types</span>
+    <span class="tag purple">Custom Error</span>
+    <span class="tag green">Global Handler</span>
+    <span class="tag blue">HTTP Errors</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">انواع خطا در Node.js</h2>
+  <p>خطاها در Node.js به چند دسته تقسیم می‌شوند. شناخت هر کدام کمک می‌کند بهتر مدیریتشان کنیم:</p>
+
+  <div class="error-types">
+    <div class="error-card">
+      <h4 style="color:#f87171">SyntaxError</h4>
+      <p>کد نادرست نوشته شده — قبل از اجرا توسط JS engine کشف می‌شود. مثل جا انداختن یک پرانتز.</p>
+    </div>
+    <div class="error-card">
+      <h4 style="color:#fbbf24">TypeError</h4>
+      <p>استفاده از چیزی به روش اشتباه — مثل صدا زدن متد روی null یا undefined.</p>
+    </div>
+    <div class="error-card">
+      <h4 style="color:var(--accent2)">ReferenceError</h4>
+      <p>استفاده از متغیری که وجود ندارد — مثل نوشتن اسم متغیر اشتباه.</p>
+    </div>
+    <div class="error-card">
+      <h4 style="color:var(--accent3)">Custom Error</h4>
+      <p>خطاهایی که خودتان تعریف می‌کنید — مثل ValidationError، NotFoundError، UnauthorizedError.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">try/catch — مدیریت پایه خطا</h2>
+  <p>
+    <strong>try/catch</strong> اساسی‌ترین روش مدیریت خطا در JavaScript است.
+    کد داخل <code>try</code> اجرا می‌شود. اگر خطایی رخ دهد، به <code>catch</code> می‌رود.
+    <code>finally</code> همیشه اجرا می‌شود — چه خطا بود چه نبود.
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">try-catch-basic.js</span></div>
+    <div class="code-body"><span class="c-comment">// ساختار اصلی try/catch/finally</span>
+<span class="c-keyword">function</span> <span class="c-fn">divideNumbers</span>(a, b) {
+  <span class="c-keyword">try</span> {
+    <span class="c-comment">// این کد ممکن است خطا بدهد</span>
+    <span class="c-keyword">if</span> (b === <span class="c-num">0</span>) <span class="c-keyword">throw new</span> <span class="c-fn">Error</span>(<span class="c-string">'تقسیم بر صفر مجاز نیست'</span>);
+    <span class="c-keyword">const</span> result = a / b;
+    console.<span class="c-fn">log</span>(<span class="c-string">`نتیجه: ${result}`</span>);
+    <span class="c-keyword">return</span> result;
+  } <span class="c-keyword">catch</span> (error) {
+    <span class="c-comment">// error.message پیام خطا، error.name نوع خطا</span>
+    console.<span class="c-fn">error</span>(<span class="c-string">`خطا: ${error.message}`</span>);
+    <span class="c-keyword">return null</span>;
+  } <span class="c-keyword">finally</span> {
+    <span class="c-comment">// این قسمت همیشه اجرا می‌شود — حتی اگر return در try باشد</span>
+    console.<span class="c-fn">log</span>(<span class="c-string">'تابع تمام شد'</span>);
+  }
+}
+
+<span class="c-fn">divideNumbers</span>(<span class="c-num">10</span>, <span class="c-num">2</span>);
+<span class="c-comment">// نتیجه: 5
+// تابع تمام شد</span>
+
+<span class="c-fn">divideNumbers</span>(<span class="c-num">10</span>, <span class="c-num">0</span>);
+<span class="c-comment">// خطا: تقسیم بر صفر مجاز نیست
+// تابع تمام شد</span>
+
+<span class="c-comment">// catch کردن خطاهای مختلف</span>
+<span class="c-keyword">try</span> {
+  <span class="c-keyword">const</span> data = <span class="c-fn">JSON</span>.<span class="c-fn">parse</span>(<span class="c-string">'invalid json{'</span>);
+} <span class="c-keyword">catch</span> (error) {
+  <span class="c-keyword">if</span> (error <span class="c-keyword">instanceof</span> SyntaxError) {
+    console.<span class="c-fn">error</span>(<span class="c-string">'JSON نامعتبر است'</span>);
+  } <span class="c-keyword">else</span> {
+    console.<span class="c-fn">error</span>(<span class="c-string">'خطای ناشناخته:'</span>, error.message);
+  }
+}</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Custom Error — خطاهای سفارشی</h2>
+  <p>
+    در پروژه‌های واقعی باید خطاهای مختلف را از هم تشخیص دهیم.
+    مثلاً «کاربر پیدا نشد» با «دسترسی رد شد» فرق دارد و HTTP status code متفاوتی دارند.
+    برای این کار <strong>Custom Error</strong> می‌سازیم:
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">errors/AppError.js</span></div>
+    <div class="code-body"><span class="c-comment">// کلاس پایه برای همه خطاهای برنامه</span>
+<span class="c-keyword">class</span> <span class="c-fn">AppError</span> <span class="c-keyword">extends</span> Error {
+  <span class="c-fn">constructor</span>(message, statusCode = <span class="c-num">500</span>, code = <span class="c-string">'INTERNAL_ERROR'</span>) {
+    <span class="c-keyword">super</span>(message);           <span class="c-comment">// پیام به Error پایه می‌رود</span>
+    <span class="c-keyword">this</span>.name = <span class="c-string">'AppError'</span>;
+    <span class="c-keyword">this</span>.statusCode = statusCode; <span class="c-comment">// HTTP status code</span>
+    <span class="c-keyword">this</span>.code = code;             <span class="c-comment">// کد خطا برای client</span>
+    <span class="c-keyword">this</span>.isOperational = <span class="c-keyword">true</span>;   <span class="c-comment">// خطای عملیاتی — نه باگ برنامه</span>
+    Error.<span class="c-fn">captureStackTrace</span>(<span class="c-keyword">this</span>, <span class="c-keyword">this</span>.constructor);
+  }
+}
+
+<span class="c-comment">// خطاهای مختلف با HTTP status مناسب</span>
+<span class="c-keyword">class</span> <span class="c-fn">NotFoundError</span> <span class="c-keyword">extends</span> <span class="c-fn">AppError</span> {
+  <span class="c-fn">constructor</span>(resource = <span class="c-string">'Resource'</span>) {
+    <span class="c-keyword">super</span>(<span class="c-string">`${resource} not found`</span>, <span class="c-num">404</span>, <span class="c-string">'NOT_FOUND'</span>);
+    <span class="c-keyword">this</span>.name = <span class="c-string">'NotFoundError'</span>;
+  }
+}
+
+<span class="c-keyword">class</span> <span class="c-fn">ValidationError</span> <span class="c-keyword">extends</span> <span class="c-fn">AppError</span> {
+  <span class="c-fn">constructor</span>(message, fields = {}) {
+    <span class="c-keyword">super</span>(message, <span class="c-num">400</span>, <span class="c-string">'VALIDATION_ERROR'</span>);
+    <span class="c-keyword">this</span>.name = <span class="c-string">'ValidationError'</span>;
+    <span class="c-keyword">this</span>.fields = fields; <span class="c-comment">// کدام field اشتباه است</span>
+  }
+}
+
+<span class="c-keyword">class</span> <span class="c-fn">UnauthorizedError</span> <span class="c-keyword">extends</span> <span class="c-fn">AppError</span> {
+  <span class="c-fn">constructor</span>(message = <span class="c-string">'Authentication required'</span>) {
+    <span class="c-keyword">super</span>(message, <span class="c-num">401</span>, <span class="c-string">'UNAUTHORIZED'</span>);
+    <span class="c-keyword">this</span>.name = <span class="c-string">'UnauthorizedError'</span>;
+  }
+}
+
+<span class="c-keyword">class</span> <span class="c-fn">ForbiddenError</span> <span class="c-keyword">extends</span> <span class="c-fn">AppError</span> {
+  <span class="c-fn">constructor</span>(message = <span class="c-string">'Access denied'</span>) {
+    <span class="c-keyword">super</span>(message, <span class="c-num">403</span>, <span class="c-string">'FORBIDDEN'</span>);
+    <span class="c-keyword">this</span>.name = <span class="c-string">'ForbiddenError'</span>;
+  }
+}
+
+module.exports = { AppError, NotFoundError, ValidationError, UnauthorizedError, ForbiddenError };</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">services/userService.js — استفاده از Custom Error</span></div>
+    <div class="code-body"><span class="c-keyword">const</span> { NotFoundError, ValidationError } = <span class="c-fn">require</span>(<span class="c-string">'../errors/AppError'</span>);
+
+<span class="c-keyword">async function</span> <span class="c-fn">getUserById</span>(id) {
+  <span class="c-comment">// validation</span>
+  <span class="c-keyword">if</span> (!id || <span class="c-keyword">typeof</span> id !== <span class="c-string">'string'</span>) {
+    <span class="c-keyword">throw new</span> <span class="c-fn">ValidationError</span>(<span class="c-string">'ID must be a valid string'</span>, { id: <span class="c-string">'Invalid format'</span> });
+  }
+
+  <span class="c-keyword">const</span> user = <span class="c-keyword">await</span> db.<span class="c-fn">findUser</span>(id);
+
+  <span class="c-keyword">if</span> (!user) {
+    <span class="c-keyword">throw new</span> <span class="c-fn">NotFoundError</span>(<span class="c-string">'User'</span>); <span class="c-comment">// "User not found"</span>
+  }
+
+  <span class="c-keyword">return</span> user;
+}</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Error Middleware در Express/Fastify</h2>
+  <p>
+    در یک API، به جای اینکه در هر route خطا را مدیریت کنید، یک middleware مرکزی می‌سازید.
+    همه خطاها به این middleware می‌رسند و پاسخ مناسب JSON برمی‌گرداند:
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">middleware/errorHandler.js</span></div>
+    <div class="code-body"><span class="c-keyword">const</span> { AppError } = <span class="c-fn">require</span>(<span class="c-string">'../errors/AppError'</span>);
+
+<span class="c-comment">// در Express: middleware با 4 پارامتر = error handler</span>
+<span class="c-keyword">function</span> <span class="c-fn">errorHandler</span>(err, req, res, next) {
+  <span class="c-comment">// اگر خطا از نوع AppError است — خطای عملیاتی</span>
+  <span class="c-keyword">if</span> (err <span class="c-keyword">instanceof</span> AppError) {
+    <span class="c-keyword">return</span> res.<span class="c-fn">status</span>(err.statusCode).<span class="c-fn">json</span>({
+      success: <span class="c-keyword">false</span>,
+      error: {
+        code:    err.code,
+        message: err.message,
+        fields:  err.fields   <span class="c-comment">// فقط در ValidationError</span>
+      }
+    });
+  }
+
+  <span class="c-comment">// خطاهای MongoDB</span>
+  <span class="c-keyword">if</span> (err.name === <span class="c-string">'CastError'</span>) {
+    <span class="c-keyword">return</span> res.<span class="c-fn">status</span>(<span class="c-num">400</span>).<span class="c-fn">json</span>({
+      success: <span class="c-keyword">false</span>,
+      error: { code: <span class="c-string">'INVALID_ID'</span>, message: <span class="c-string">'Invalid ID format'</span> }
+    });
+  }
+
+  <span class="c-comment">// خطای ناشناخته — باگ برنامه</span>
+  <span class="c-comment">// در production: لاگ بزنید ولی جزئیات به کاربر ندهید</span>
+  console.<span class="c-fn">error</span>(<span class="c-string">'Unexpected error:'</span>, err);
+
+  res.<span class="c-fn">status</span>(<span class="c-num">500</span>).<span class="c-fn">json</span>({
+    success: <span class="c-keyword">false</span>,
+    error: {
+      code: <span class="c-string">'INTERNAL_ERROR'</span>,
+      message: process.env.NODE_ENV === <span class="c-string">'production'</span>
+        ? <span class="c-string">'Something went wrong'</span>  <span class="c-comment">// پیام ساده در production</span>
+        : err.message               <span class="c-comment">// پیام کامل در development</span>
+    }
+  });
+}
+
+module.exports = errorHandler;</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">app.js — استفاده از error handler</span></div>
+    <div class="code-body"><span class="c-keyword">const</span> express = <span class="c-fn">require</span>(<span class="c-string">'express'</span>);
+<span class="c-keyword">const</span> errorHandler = <span class="c-fn">require</span>(<span class="c-string">'./middleware/errorHandler'</span>);
+<span class="c-keyword">const</span> { NotFoundError } = <span class="c-fn">require</span>(<span class="c-string">'./errors/AppError'</span>);
+
+<span class="c-keyword">const</span> app = <span class="c-fn">express</span>();
+
+<span class="c-comment">// routeها اینجا می‌آیند</span>
+app.<span class="c-fn">use</span>(<span class="c-string">'/api/users'</span>, userRoutes);
+
+<span class="c-comment">// اگر هیچ route پیدا نشد — 404</span>
+app.<span class="c-fn">use</span>((req, res, next) => {
+  next(<span class="c-keyword">new</span> <span class="c-fn">NotFoundError</span>(<span class="c-string">'Route'</span>));
+});
+
+<span class="c-comment">// error handler باید آخر از همه باشد</span>
+app.<span class="c-fn">use</span>(errorHandler);</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Unhandled Errors — خطاهای کنترل‌نشده</h2>
+  <p>
+    بعضی خطاها از try/catch رد می‌شوند — مثل خطاهای async که catch نشده‌اند.
+    Node.js دو event دارد که این‌ها را catch می‌کند:
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">process-error-handlers.js</span></div>
+    <div class="code-body"><span class="c-comment">// خطاهای async که catch نشده‌اند</span>
+process.<span class="c-fn">on</span>(<span class="c-string">'unhandledRejection'</span>, (reason, promise) => {
+  console.<span class="c-fn">error</span>(<span class="c-string">'🔴 Unhandled Promise Rejection:'</span>, reason);
+  <span class="c-comment">// در production: log کنید و gracefully shutdown</span>
+  process.<span class="c-fn">exit</span>(<span class="c-num">1</span>);
+});
+
+<span class="c-comment">// خطاهای synchronous کنترل‌نشده</span>
+process.<span class="c-fn">on</span>(<span class="c-string">'uncaughtException'</span>, (error) => {
+  console.<span class="c-fn">error</span>(<span class="c-string">'🔴 Uncaught Exception:'</span>, error);
+  <span class="c-comment">// برنامه باید خاتمه یابد — وضعیت نامشخص است</span>
+  process.<span class="c-fn">exit</span>(<span class="c-num">1</span>);
+});
+
+<span class="c-comment">// Graceful Shutdown — وقتی SIGTERM می‌آید</span>
+process.<span class="c-fn">on</span>(<span class="c-string">'SIGTERM'</span>, <span class="c-keyword">async</span> () => {
+  console.<span class="c-fn">log</span>(<span class="c-string">'SIGTERM received. Shutting down gracefully...'</span>);
+  <span class="c-comment">// اتصال‌های باز را ببندید</span>
+  <span class="c-keyword">await</span> db.<span class="c-fn">disconnect</span>();
+  server.<span class="c-fn">close</span>(() => {
+    console.<span class="c-fn">log</span>(<span class="c-string">'Server closed.'</span>);
+    process.<span class="c-fn">exit</span>(<span class="c-num">0</span>);
+  });
+});</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">نکات کلیدی برای مصاحبه</h2>
+  <ul class="key-points">
+    <li><strong>try/catch</strong> فقط خطاهای synchronous را catch می‌کند. برای async از <code>try/catch</code> با <code>await</code> یا <code>.catch()</code> استفاده کنید.</li>
+    <li>Custom Error class بسازید که از Error ارث ببرد — <strong>statusCode</strong> و <strong>code</strong> اضافه کنید.</li>
+    <li>خطاهای <strong>operational</strong> (قابل انتظار مثل 404) را از خطاهای <strong>programming</strong> (باگ) جدا کنید.</li>
+    <li>در API ها یک <strong>error middleware مرکزی</strong> بسازید — هر route نباید خودش خطا را format کند.</li>
+    <li>در production جزئیات خطا را به کاربر ندهید — فقط یک پیام ساده. جزئیات را log کنید.</li>
+    <li><strong>unhandledRejection</strong> و <strong>uncaughtException</strong> را handle کنید تا برنامه silently نمیرد.</li>
+    <li>سوال رایج: «فرق خطای operational و programming چیست؟» — operational یعنی خطایی که انتظارش را دارید و بخشی از منطق برنامه است (مثل کاربر پیدا نشد)؛ programming یعنی باگ واقعی در کد (مثل صدا زدن متد روی undefined) که باید اصلاح شود، نه handle.</li>
+    <li>یک تله رایج: catch کردن خطا و هیچ کاری نکردن (<code>catch(e) {}</code>) — خطا را قورت می‌دهد و دیباگ کردن مشکل بعدی را خیلی سخت می‌کند.</li>
+    <li>بعد از <strong>uncaughtException</strong>، توصیه Node.js این است که برنامه را graceful shutdown کنید و restart شود (مثلاً با PM2) — چون وضعیت داخلی برنامه ممکن است دیگر قابل اعتماد نباشد.</li>
+    <li>در Express/Fastify، اگر یک async route handler خطا throw کند بدون مدیریت، ممکن است برنامه crash کند؛ باید حتماً wrapper یا middleware مخصوص async error داشته باشید.</li>
+  </ul>
+
+  <div class="chapter-nav">
+    <a class="nav-btn" href="nodejs-course-chapter12.html">← فصل قبلی: TypeScript</a>
+    <a class="nav-btn next" href="nodejs-course-chapter14.html">فصل بعدی: Async Programming →</a>
+  </div>
+</main>
+<script>
+function toggleMobileMenu(){
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('open');
+}
+// بستن منو با کلیک روی هر لینک فصل (تجربه بهتر در موبایل)
+document.querySelectorAll('.sidebar .nav-item').forEach(function(link){
+  link.addEventListener('click', function(){
+    document.querySelector('.sidebar').classList.remove('open');
+    document.getElementById('mobileOverlay').classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>

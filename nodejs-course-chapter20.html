@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>دوره Node.js — فصل ۲۰: MongoDB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--border:#2a3347;--accent:#4ade80;--accent2:#22d3ee;--accent3:#a78bfa;--text:#e2e8f0;--text-muted:#8b9ab5;--text-dim:#4a5568;--code-bg:#0d1117}
+  body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;display:flex;min-height:100vh;overflow-x:hidden}
+  .sidebar{width:280px;min-width:280px;background:var(--bg2);border-left:1px solid var(--border);padding:2rem 0;position:fixed;right:0;top:0;height:100vh;overflow-y:auto;z-index:100}
+  .sidebar-logo{padding:0 1.5rem 1.5rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+  .sidebar-logo .logo-icon{width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem}
+  .sidebar-logo h2{font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px}
+  .sidebar-logo p{font-size:12px;color:var(--text-muted)}
+  .nav-section-title{font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;padding:0 1.5rem;margin:1.25rem 0 0.5rem}
+  .nav-item{display:flex;align-items:center;gap:0.6rem;padding:0.55rem 1.5rem;font-size:13px;color:var(--text-muted);cursor:pointer;border-right:3px solid transparent;transition:all 0.15s;text-decoration:none}
+  .nav-item:hover{background:var(--bg3);color:var(--text)}
+  .nav-item.active{background:rgba(74,222,128,0.08);color:var(--accent);border-right-color:var(--accent);font-weight:500}
+  .nav-item .num{font-size:11px;background:var(--bg3);border-radius:4px;padding:1px 6px;min-width:24px;text-align:center;font-family:'Fira Code',monospace}
+  .nav-item.active .num{background:rgba(74,222,128,0.15);color:var(--accent)}
+  .main{margin-right:280px;flex:1;padding:3rem 3.5rem 5rem;max-width:860px}
+  .chapter-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);border-radius:20px;padding:4px 14px;font-size:12px;color:var(--accent);margin-bottom:1rem;font-weight:500}
+  h1.chapter-title{font-size:2.2rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:0.75rem}
+  h1.chapter-title span{color:var(--accent)}
+  .chapter-desc{font-size:16px;color:var(--text-muted);margin-bottom:2.5rem;max-width:600px}
+  .divider{height:1px;background:var(--border);margin:2.5rem 0}
+  h2.section-title{font-size:1.25rem;font-weight:700;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;gap:10px}
+  h2.section-title::before{content:'';display:block;width:4px;height:22px;background:var(--accent);border-radius:2px}
+  h3.sub-title{font-size:1rem;font-weight:700;color:var(--accent2);margin:1.5rem 0 0.6rem}
+  p{color:var(--text-muted);font-size:15px;margin-bottom:1rem}
+  strong{color:var(--text);font-weight:600}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin:1rem 0}
+  .tag{font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;font-family:'Fira Code',monospace}
+  .tag.green{background:rgba(22,101,52,0.4);color:#86efac;border:1px solid rgba(134,239,172,0.2)}
+  .tag.blue{background:rgba(30,58,95,0.6);color:#7dd3fc;border:1px solid rgba(125,211,252,0.2)}
+  .tag.purple{background:rgba(59,31,110,0.6);color:#c4b5fd;border:1px solid rgba(196,181,253,0.2)}
+  .code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:12px;margin:1.25rem 0;overflow:hidden;direction:ltr}
+  .code-header{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 1rem;background:var(--bg3);border-bottom:1px solid var(--border);direction:ltr}
+  .code-header .dots{display:flex;gap:6px}
+  .code-header .dot{width:10px;height:10px;border-radius:50%}
+  .code-header .dot.red{background:#ff5f56}.code-header .dot.yellow{background:#ffbd2e}.code-header .dot.green{background:#27c93f}
+  .code-header .filename{font-size:12px;color:var(--text-muted);font-family:'Fira Code',monospace}
+  .code-body{padding:1.25rem 1.5rem;font-family:'Fira Code',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;white-space:pre;color:#e2e8f0;text-align:left;direction:ltr}
+  .c-comment{color:#6b7e99}.c-keyword{color:#c084fc}.c-string{color:#86efac}.c-fn{color:#67e8f9}.c-num{color:#fb923c}.c-op{color:#94a3b8}
+  .note-box{background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.25);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0;display:flex;gap:0.75rem}
+  .note-box p{color:var(--text-muted);font-size:14px;margin:0}
+  .note-box strong{color:var(--accent2)}
+  .warn-box{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0;display:flex;gap:0.75rem}
+  .warn-box p{color:var(--text-muted);font-size:14px;margin:0}
+  .warn-box strong{color:#fbbf24}
+  .explain-box{background:var(--bg2);border-right:3px solid var(--accent3);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin:1rem 0}
+  .explain-box p{font-size:14px;color:var(--text-muted);margin:0}
+  .explain-box strong{color:var(--accent3)}
+  .key-points{list-style:none;margin:1rem 0}
+  .key-points li{display:flex;gap:0.75rem;align-items:flex-start;margin-bottom:0.75rem;font-size:14px;color:var(--text-muted)}
+  .key-points li::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0;margin-top:2px}
+  .compare-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
+  .compare-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.1rem}
+  .compare-card h4{font-size:13px;font-weight:700;margin-bottom:6px}
+  .compare-card p{font-size:12px;color:var(--text-muted);margin:0 0 4px}
+  .chapter-nav{display:flex;justify-content:space-between;margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border)}
+  .nav-btn{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:14px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;font-family:'Vazirmatn',sans-serif}
+  .nav-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .nav-btn.next{background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.3);color:var(--accent)}
+  
+
+  /* --- Fix: ریسپانسیو کامل --- */
+  @media(max-width:1024px){
+    .main{margin-right:240px;padding:2rem}
+    .sidebar{width:240px;min-width:240px}
+  }
+  @media(max-width:900px){
+    body{display:block}
+    .main{margin-right:0;padding:1.25rem;max-width:100%}
+    h1.chapter-title{font-size:1.6rem}
+    .chapter-desc{font-size:14px}
+    /* Safety net: هر گرید یا فلکس چندستونه در موبایل تک‌ستونی و ایمن شود */
+    .compare-grid,.cg-card,.use-cases,.pattern-grid,.arch-grid,
+    .branch-grid,.cmd-grid,.range-grid,.module-compare,.pillar-grid,
+    .test-types,.ts-benefits,.compare-row,.error-types{grid-template-columns:1fr!important}
+    .semver-box,.di-diagram,.git-states,.tdd-cycle,.ws-clients,.flow-row{flex-wrap:wrap!important}
+    .git-state,.tdd-step{flex:1 1 100%!important;min-width:0!important}
+    .code-body{font-size:12px;padding:1rem}
+    .chapter-nav{flex-direction:column;gap:10px}
+    .nav-btn{width:100%;justify-content:center;text-align:center}
+    .tags{gap:6px}
+    .tag{font-size:11px;padding:3px 10px}
+  }
+  @media(max-width:480px){
+    .main{padding:1rem}
+    h1.chapter-title{font-size:1.35rem}
+    .code-body{font-size:11px;padding:0.75rem}
+    .code-header .filename{font-size:10px}
+    .chapter-badge{font-size:11px;padding:3px 10px}
+  }
+  /* دکمه‌های قبلی/بعدی حالا لینک هستند نه button - استایل یکسان بماند */
+  a.nav-btn{text-decoration:none}
+  a.nav-btn.disabled{opacity:0.4;pointer-events:none;cursor:default}
+
+  /* --- Fix: دکمه همبرگری و منوی موبایل --- */
+  .mobile-menu-btn{
+    display:none;
+    position:fixed;
+    top:16px;
+    right:16px;
+    z-index:200;
+    width:44px;
+    height:44px;
+    background:var(--bg2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+  }
+  .mobile-menu-btn svg{width:22px;height:22px;stroke:var(--accent)}
+  .mobile-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    z-index:150;
+  }
+  .mobile-overlay.open{display:block}
+
+  @media(max-width:900px){
+    .mobile-menu-btn{display:flex}
+    .sidebar{
+      display:flex!important;
+      flex-direction:column;
+      transform:translateX(100%);
+      transition:transform 0.25s ease;
+      z-index:180;
+      box-shadow:-4px 0 20px rgba(0,0,0,0.4);
+    }
+    .sidebar.open{transform:translateX(0)}
+    .main{padding-top:4.5rem}
+  }
+</style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="باز کردن منو">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+</button>
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0f1117" stroke-width="2.5" stroke-linecap="round" width="22" height="22"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+    <h2>دوره Node.js</h2><p>۶۳ فصل — مقدماتی تا پیشرفته</p>
+  </div>
+  <div class="nav-section-title">بخش مقدماتی</div>
+  <a class="nav-item" href="nodejs-course-chapter1.html"><span class="num">01</span> معماری و تاریخچه</a>
+  <a class="nav-item" href="nodejs-course-chapter2.html"><span class="num">02</span> توسعه روی Linux</a>
+  <a class="nav-item" href="nodejs-course-chapter3.html"><span class="num">03</span> NPM و ماژول‌ها</a>
+  <a class="nav-item" href="nodejs-course-chapter4.html"><span class="num">04</span> Semantic Versioning</a>
+  <a class="nav-item" href="nodejs-course-chapter5.html"><span class="num">05</span> Git Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter6.html"><span class="num">06</span> Git Flow</a>
+  <a class="nav-item" href="nodejs-course-chapter7.html"><span class="num">07</span> Github</a>
+  <a class="nav-item" href="nodejs-course-chapter8.html"><span class="num">08</span> Testing & TDD</a>
+  <a class="nav-item" href="nodejs-course-chapter9.html"><span class="num">09</span> JS Fundamentals</a>
+  <a class="nav-item" href="nodejs-course-chapter10.html"><span class="num">10</span> OOP</a>
+  <a class="nav-item" href="nodejs-course-chapter11.html"><span class="num">11</span> Advanced JS</a>
+  <a class="nav-item" href="nodejs-course-chapter12.html"><span class="num">12</span> TypeScript</a>
+  <a class="nav-item" href="nodejs-course-chapter13.html"><span class="num">13</span> Error Handling</a>
+  <a class="nav-item" href="nodejs-course-chapter14.html"><span class="num">14</span> Async Programming</a>
+  <a class="nav-item" href="nodejs-course-chapter15.html"><span class="num">15</span> Non-Blocking & Concurrency</a>
+  <a class="nav-item" href="nodejs-course-chapter16.html"><span class="num">16</span> Async Flow Control</a>
+  <a class="nav-item" href="nodejs-course-chapter17.html"><span class="num">17</span> Web Server (Fastify)</a>
+  <a class="nav-item" href="nodejs-course-chapter18.html"><span class="num">18</span> Chat Server</a>
+  <a class="nav-item" href="nodejs-course-chapter19.html"><span class="num">19</span> Docker</a>
+  <a class="nav-item active" href="nodejs-course-chapter20.html"><span class="num">20</span> MongoDB</a>
+  <a class="nav-item" href="nodejs-course-chapter21.html"><span class="num">21</span> Redis Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter22.html"><span class="num">22</span> Frameworks & IOC</a>
+  <a class="nav-item" href="nodejs-course-chapter23.html"><span class="num">23</span> NestJS</a>
+  <div class="nav-section-title">بخش پیشرفته</div>
+  <a class="nav-item" href="nodejs-course-chapter24.html"><span class="num">24</span> Currying & Composition</a>
+  <a class="nav-item" href="nodejs-course-chapter25.html"><span class="num">25</span> Isomorphic & Idempotent</a>
+  <a class="nav-item" href="nodejs-course-chapter26.html"><span class="num">26</span> Functional Data Modeling</a>
+  <a class="nav-item" href="nodejs-course-chapter27.html"><span class="num">27</span> Zod</a>
+  <a class="nav-item" href="nodejs-course-chapter28.html"><span class="num">28</span> SOLID</a>
+  <a class="nav-item" href="nodejs-course-chapter29.html"><span class="num">29</span> GoF Design Patterns</a>
+  <a class="nav-item" href="nodejs-course-chapter30.html"><span class="num">30</span> Refactoring</a>
+  <a class="nav-item" href="nodejs-course-chapter31.html"><span class="num">31</span> Event Emitter</a>
+  <a class="nav-item" href="nodejs-course-chapter32.html"><span class="num">32</span> Pub/Sub (Cluster)</a>
+  <a class="nav-item" href="nodejs-course-chapter33.html"><span class="num">33</span> Queues & Brokers</a>
+  <a class="nav-item" href="nodejs-course-chapter34.html"><span class="num">34</span> Working with Streams</a>
+  <a class="nav-item" href="nodejs-course-chapter35.html"><span class="num">35</span> Custom Streams & Generators</a>
+  <a class="nav-item" href="nodejs-course-chapter36.html"><span class="num">36</span> RxJS</a>
+  <a class="nav-item" href="nodejs-course-chapter37.html"><span class="num">37</span> 12 Factor App</a>
+  <a class="nav-item" href="nodejs-course-chapter38.html"><span class="num">38</span> Resilience Patterns</a>
+  <a class="nav-item" href="nodejs-course-chapter39.html"><span class="num">39</span> Postgres Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter40.html"><span class="num">40</span> TypeORM</a>
+  <a class="nav-item" href="nodejs-course-chapter41.html"><span class="num">41</span> TS: Thinking in Types</a>
+  <a class="nav-item" href="nodejs-course-chapter42.html"><span class="num">42</span> Web Frameworks Compare</a>
+  <a class="nav-item" href="nodejs-course-chapter43.html"><span class="num">43</span> Onion & Clean Architecture</a>
+  <a class="nav-item" href="nodejs-course-chapter44.html"><span class="num">44</span> Microservices Patterns</a>
+  <div class="nav-section-title">بخش تکمیلی</div>
+  <a class="nav-item" href="nodejs-course-chapter45.html"><span class="num">45</span> Authentication (JWT)</a>
+  <a class="nav-item" href="nodejs-course-chapter46.html"><span class="num">46</span> Authorization & RBAC</a>
+  <a class="nav-item" href="nodejs-course-chapter47.html"><span class="num">47</span> Security Essentials</a>
+  <a class="nav-item" href="nodejs-course-chapter48.html"><span class="num">48</span> Caching Strategies</a>
+  <a class="nav-item" href="nodejs-course-chapter49.html"><span class="num">49</span> API Design</a>
+  <a class="nav-item" href="nodejs-course-chapter50.html"><span class="num">50</span> Monitoring & Observability</a>
+  <a class="nav-item" href="nodejs-course-chapter51.html"><span class="num">51</span> Advanced Testing</a>
+  <a class="nav-item" href="nodejs-course-chapter52.html"><span class="num">52</span> Node.js Internals & Memory</a>
+  <a class="nav-item" href="nodejs-course-chapter53.html"><span class="num">53</span> Serverless (AWS Lambda)</a>
+  <a class="nav-item" href="nodejs-course-chapter54.html"><span class="num">54</span> CI/CD Pipeline کامل</a>
+  <div class="nav-section-title">بخش عملی نهایی</div>
+  <a class="nav-item" href="nodejs-course-chapter55.html"><span class="num">55</span> PM2 & Process Management</a>
+  <a class="nav-item" href="nodejs-course-chapter56.html"><span class="num">56</span> File Upload & Streaming</a>
+  <a class="nav-item" href="nodejs-course-chapter57.html"><span class="num">57</span> Webhooks</a>
+  <a class="nav-item" href="nodejs-course-chapter58.html"><span class="num">58</span> Cron & Scheduled Tasks</a>
+  <a class="nav-item" href="nodejs-course-chapter59.html"><span class="num">59</span> npm Monorepo & Workspaces</a>
+  <a class="nav-item" href="nodejs-course-chapter60.html"><span class="num">60</span> Config Validation & Feature Flags</a>
+  <a class="nav-item" href="nodejs-course-chapter61.html"><span class="num">61</span> gRPC</a>
+  <div class="nav-section-title">تمرکز ویژه مصاحبه</div>
+  <a class="nav-item" href="nodejs-course-chapter62.html"><span class="num">62</span> Express.js عمیق</a>
+  <a class="nav-item" href="nodejs-course-chapter63.html"><span class="num">63</span> NestJS پیشرفته</a>
+  <a class="nav-item" href="nodejs-course-chapter64.html"><span class="num">64</span> OOP کامل و Decorators</a>
+</aside>
+
+<main class="main">
+  <div class="chapter-badge"><span>●</span> فصل بیستم</div>
+  <h1 class="chapter-title">MongoDB<br/><span>دیتابیس NoSQL</span></h1>
+  <p class="chapter-desc">
+    MongoDB یک دیتابیس NoSQL است که داده‌ها را به صورت document (شبیه JSON) ذخیره می‌کند.
+    در این فصل با Mongoose — محبوب‌ترین ODM برای MongoDB — یاد می‌گیریم
+    چطور schema تعریف کنیم، query بنویسیم و روابط بین document‌ها را مدیریت کنیم.
+  </p>
+  <div class="tags">
+    <span class="tag green">MongoDB</span>
+    <span class="tag blue">Mongoose</span>
+    <span class="tag purple">Schema</span>
+    <span class="tag green">CRUD</span>
+    <span class="tag blue">Aggregation</span>
+    <span class="tag purple">Populate</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">SQL vs MongoDB — چه فرقی دارند؟</h2>
+  <p>قبل از یادگیری MongoDB باید تفاوتش با دیتابیس‌های رابطه‌ای (مثل MySQL) را بدانید:</p>
+
+  <div class="compare-row">
+    <div class="compare-card">
+      <h4 style="color:#fbbf24">SQL (مثل MySQL)</h4>
+      <p>داده در جداول با ردیف و ستون</p>
+      <p>Schema ثابت — همه ردیف‌ها یک شکل</p>
+      <p>JOIN برای روابط</p>
+      <p>مناسب: داده‌های ساختارمند، transaction مهم</p>
+    </div>
+    <div class="compare-card">
+      <h4 style="color:var(--accent)">MongoDB (NoSQL)</h4>
+      <p>داده در document — شبیه JSON</p>
+      <p>Schema انعطاف‌پذیر — هر document می‌تواند فرق داشته باشد</p>
+      <p>Embed یا Reference برای روابط</p>
+      <p>مناسب: داده‌های متغیر، scaling افقی</p>
+    </div>
+  </div>
+
+  <div class="explain-box">
+    <p><strong>اصطلاحات معادل:</strong> جدول (Table) → Collection | ردیف (Row) → Document | ستون (Column) → Field | JOIN → Populate</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">نصب و اتصال با Mongoose</h2>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">terminal</span></div>
+    <div class="code-body">npm install mongoose</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">config/database.js</span></div>
+    <div class="code-body"><span class="c-keyword">const</span> mongoose = <span class="c-fn">require</span>(<span class="c-string">'mongoose'</span>);
+
+<span class="c-keyword">async function</span> <span class="c-fn">connectDB</span>() {
+  <span class="c-keyword">try</span> {
+    <span class="c-keyword">const</span> conn = <span class="c-keyword">await</span> mongoose.<span class="c-fn">connect</span>(process.env.DB_URL, {
+      <span class="c-comment">// این optionها دیگر لازم نیستند در Mongoose 6+ ولی می‌بینیدشان</span>
+    });
+    console.<span class="c-fn">log</span>(<span class="c-string">`✅ MongoDB متصل شد: ${conn.connection.host}`</span>);
+  } <span class="c-keyword">catch</span> (error) {
+    console.<span class="c-fn">error</span>(<span class="c-string">'❌ خطا در اتصال MongoDB:'</span>, error.message);
+    process.<span class="c-fn">exit</span>(<span class="c-num">1</span>);
+  }
+}
+
+<span class="c-comment">// رویدادهای connection</span>
+mongoose.connection.<span class="c-fn">on</span>(<span class="c-string">'disconnected'</span>, () => {
+  console.<span class="c-fn">warn</span>(<span class="c-string">'MongoDB قطع شد'</span>);
+});
+
+module.exports = connectDB;</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Schema و Model تعریف کنید</h2>
+  <p>
+    در Mongoose ابتدا <strong>Schema</strong> تعریف می‌کنید — شکل document را مشخص می‌کند.
+    سپس از Schema یک <strong>Model</strong> می‌سازید — interface اصلی برای کار با دیتابیس است.
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">models/User.js</span></div>
+    <div class="code-body"><span class="c-keyword">const</span> mongoose = <span class="c-fn">require</span>(<span class="c-string">'mongoose'</span>);
+
+<span class="c-keyword">const</span> userSchema = <span class="c-keyword">new</span> mongoose.<span class="c-fn">Schema</span>({
+  name: {
+    type:     String,
+    required: [<span class="c-keyword">true</span>, <span class="c-string">'نام الزامی است'</span>],
+    trim:     <span class="c-keyword">true</span>,
+    minlength: <span class="c-num">2</span>,
+    maxlength: <span class="c-num">50</span>
+  },
+  email: {
+    type:     String,
+    required: <span class="c-keyword">true</span>,
+    unique:   <span class="c-keyword">true</span>,      <span class="c-comment">// unique index می‌سازد</span>
+    lowercase: <span class="c-keyword">true</span>,    <span class="c-comment">// خودکار lowercase می‌کند</span>
+    match:    [/\S+@\S+\.\S+/, <span class="c-string">'ایمیل نامعتبر است'</span>]
+  },
+  password: {
+    type:     String,
+    required: <span class="c-keyword">true</span>,
+    select:   <span class="c-keyword">false</span>  <span class="c-comment">// در query‌ها خودکار حذف می‌شود</span>
+  },
+  role: {
+    type:    String,
+    enum:    [<span class="c-string">'user'</span>, <span class="c-string">'admin'</span>],
+    default: <span class="c-string">'user'</span>
+  },
+  age: { type: Number, min: <span class="c-num">0</span>, max: <span class="c-num">120</span> },
+  isActive: { type: Boolean, default: <span class="c-keyword">true</span> },
+  tags: [String],  <span class="c-comment">// آرایه از string</span>
+  address: {
+    city:    String,
+    country: { type: String, default: <span class="c-string">'Iran'</span> }
+  }
+}, {
+  timestamps: <span class="c-keyword">true</span>  <span class="c-comment">// خودکار createdAt و updatedAt اضافه می‌کند</span>
+});
+
+<span class="c-comment">// Virtual — field محاسبه‌شده که در DB ذخیره نمی‌شود</span>
+userSchema.<span class="c-fn">virtual</span>(<span class="c-string">'displayName'</span>).<span class="c-fn">get</span>(<span class="c-keyword">function</span>() {
+  <span class="c-keyword">return</span> <span class="c-string">`${this.name} (${this.role})`</span>;
+});
+
+<span class="c-comment">// Middleware — قبل از save اجرا می‌شود</span>
+userSchema.<span class="c-fn">pre</span>(<span class="c-string">'save'</span>, <span class="c-keyword">async function</span>(next) {
+  <span class="c-comment">// اگر password تغییر کرده، hash کنید</span>
+  <span class="c-keyword">if</span> (<span class="c-keyword">this</span>.<span class="c-fn">isModified</span>(<span class="c-string">'password'</span>)) {
+    <span class="c-keyword">this</span>.password = <span class="c-keyword">await</span> bcrypt.<span class="c-fn">hash</span>(<span class="c-keyword">this</span>.password, <span class="c-num">12</span>);
+  }
+  <span class="c-fn">next</span>();
+});
+
+<span class="c-keyword">const</span> User = mongoose.<span class="c-fn">model</span>(<span class="c-string">'User'</span>, userSchema);
+<span class="c-comment">// 'User' → در MongoDB collection به نام 'users' می‌شود (plural lowercase)</span>
+
+module.exports = User;</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">CRUD Operations با Mongoose</h2>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">services/userService.js — CRUD کامل</span></div>
+    <div class="code-body"><span class="c-keyword">const</span> User = <span class="c-fn">require</span>(<span class="c-string">'../models/User'</span>);
+
+<span class="c-comment">// CREATE — ساخت document جدید</span>
+<span class="c-keyword">async function</span> <span class="c-fn">createUser</span>(data) {
+  <span class="c-keyword">const</span> user = <span class="c-keyword">await</span> User.<span class="c-fn">create</span>(data);
+  <span class="c-comment">// یا: const user = new User(data); await user.save();</span>
+  <span class="c-keyword">return</span> user;
+}
+
+<span class="c-comment">// READ — خواندن</span>
+<span class="c-keyword">async function</span> <span class="c-fn">getUsers</span>({ page = <span class="c-num">1</span>, limit = <span class="c-num">10</span>, role }) {
+  <span class="c-keyword">const</span> filter = role ? { role } : {};
+
+  <span class="c-keyword">const</span> [users, total] = <span class="c-keyword">await</span> Promise.<span class="c-fn">all</span>([
+    User.<span class="c-fn">find</span>(filter)
+      .<span class="c-fn">select</span>(<span class="c-string">'-password'</span>)           <span class="c-comment">// password را حذف کن</span>
+      .<span class="c-fn">sort</span>({ createdAt: -<span class="c-num">1</span> })     <span class="c-comment">// جدیدترین اول</span>
+      .<span class="c-fn">skip</span>((page - <span class="c-num">1</span>) * limit)    <span class="c-comment">// pagination</span>
+      .<span class="c-fn">limit</span>(limit)
+      .<span class="c-fn">lean</span>(),                       <span class="c-comment">// plain JS object — سریع‌تر</span>
+    User.<span class="c-fn">countDocuments</span>(filter)
+  ]);
+
+  <span class="c-keyword">return</span> { users, total, pages: Math.<span class="c-fn">ceil</span>(total / limit) };
+}
+
+<span class="c-keyword">async function</span> <span class="c-fn">getUserById</span>(id) {
+  <span class="c-keyword">return</span> User.<span class="c-fn">findById</span>(id).<span class="c-fn">select</span>(<span class="c-string">'-password'</span>).<span class="c-fn">lean</span>();
+}
+
+<span class="c-comment">// UPDATE — آپدیت</span>
+<span class="c-keyword">async function</span> <span class="c-fn">updateUser</span>(id, data) {
+  <span class="c-keyword">return</span> User.<span class="c-fn">findByIdAndUpdate</span>(
+    id,
+    { $set: data },   <span class="c-comment">// فقط فیلدهای داده شده آپدیت شود</span>
+    { new: <span class="c-keyword">true</span>, runValidators: <span class="c-keyword">true</span> }
+    <span class="c-comment">// new: document آپدیت شده برگردد
+    // runValidators: schema validation اجرا شود</span>
+  );
+}
+
+<span class="c-comment">// DELETE — حذف</span>
+<span class="c-keyword">async function</span> <span class="c-fn">deleteUser</span>(id) {
+  <span class="c-keyword">return</span> User.<span class="c-fn">findByIdAndDelete</span>(id);
+}
+
+module.exports = { createUser, getUsers, getUserById, updateUser, deleteUser };</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Query Operators — فیلترهای پیشرفته</h2>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">query-operators.js</span></div>
+    <div class="code-body"><span class="c-comment">// مقایسه</span>
+User.<span class="c-fn">find</span>({ age: { $gt: <span class="c-num">18</span> } });          <span class="c-comment">// age > 18</span>
+User.<span class="c-fn">find</span>({ age: { $gte: <span class="c-num">18</span>, $lte: <span class="c-num">65</span> } }); <span class="c-comment">// 18 <= age <= 65</span>
+User.<span class="c-fn">find</span>({ role: { $in: [<span class="c-string">'admin'</span>, <span class="c-string">'moderator'</span>] } }); <span class="c-comment">// یکی از این‌ها</span>
+User.<span class="c-fn">find</span>({ role: { $ne: <span class="c-string">'banned'</span>} });  <span class="c-comment">// not equal</span>
+
+<span class="c-comment">// منطقی</span>
+User.<span class="c-fn">find</span>({ $and: [{ isActive: <span class="c-keyword">true</span> }, { age: { $gt: <span class="c-num">18</span> } }] });
+User.<span class="c-fn">find</span>({ $or: [{ role: <span class="c-string">'admin'</span> }, { role: <span class="c-string">'moderator'</span> }] });
+
+<span class="c-comment">// متن — جستجو در رشته</span>
+User.<span class="c-fn">find</span>({ name: /ali/i });       <span class="c-comment">// regex — case insensitive</span>
+User.<span class="c-fn">find</span>({ $text: { $search: <span class="c-string">'ali'</span> } }); <span class="c-comment">// text index لازم دارد</span>
+
+<span class="c-comment">// آرایه</span>
+User.<span class="c-fn">find</span>({ tags: <span class="c-string">'nodejs'</span> });          <span class="c-comment">// آرایه شامل این مقدار</span>
+User.<span class="c-fn">find</span>({ tags: { $all: [<span class="c-string">'nodejs'</span>, <span class="c-string">'js'</span>] } }); <span class="c-comment">// همه این‌ها</span>
+
+<span class="c-comment">// Update operators</span>
+User.<span class="c-fn">updateOne</span>({ _id: id }, {
+  $set:   { name: <span class="c-string">'Ali'</span> },        <span class="c-comment">// مقدار را set کن</span>
+  $inc:   { loginCount: <span class="c-num">1</span> },      <span class="c-comment">// عدد را اضافه کن</span>
+  $push:  { tags: <span class="c-string">'nodejs'</span> },     <span class="c-comment">// به آرایه اضافه کن</span>
+  $pull:  { tags: <span class="c-string">'php'</span> },        <span class="c-comment">// از آرایه حذف کن</span>
+  $unset: { temporaryField: <span class="c-string">''</span> }  <span class="c-comment">// field را حذف کن</span>
+});</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Populate — روابط بین Collection‌ها</h2>
+  <p>
+    وقتی یک document به document دیگری reference دارد،
+    با <strong>populate</strong> می‌توانید آن را لود کنید — مثل JOIN در SQL:
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">models/Post.js و populate</span></div>
+    <div class="code-body"><span class="c-comment">// Post با reference به User</span>
+<span class="c-keyword">const</span> postSchema = <span class="c-keyword">new</span> mongoose.<span class="c-fn">Schema</span>({
+  title:  String,
+  body:   String,
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref:  <span class="c-string">'User'</span>  <span class="c-comment">// به model 'User' اشاره دارد</span>
+  },
+  tags: [String]
+}, { timestamps: <span class="c-keyword">true</span> });
+
+<span class="c-keyword">const</span> Post = mongoose.<span class="c-fn">model</span>(<span class="c-string">'Post'</span>, postSchema);
+
+<span class="c-comment">// Populate — جزئیات author را لود کن</span>
+<span class="c-keyword">const</span> posts = <span class="c-keyword">await</span> Post
+  .<span class="c-fn">find</span>({ tags: <span class="c-string">'nodejs'</span> })
+  .<span class="c-fn">populate</span>(<span class="c-string">'author'</span>, <span class="c-string">'name email'</span>)  <span class="c-comment">// فقط name و email</span>
+  .<span class="c-fn">sort</span>({ createdAt: -<span class="c-num">1</span> })
+  .<span class="c-fn">lean</span>();
+
+<span class="c-comment">// نتیجه:
+// { title: '...', author: { name: 'Ali', email: 'ali@test.com' }, ... }</span></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">نکات کلیدی برای مصاحبه</h2>
+  <ul class="key-points">
+    <li>MongoDB داده را به صورت <strong>BSON</strong> (Binary JSON) ذخیره می‌کند — از اینجاست که شبیه JSON به نظر می‌رسد.</li>
+    <li><strong>Mongoose Schema</strong> ساختار document را تعریف می‌کند و validation را handle می‌کند.</li>
+    <li><code>lean()</code> را هر وقت نیازی به Mongoose document methods ندارید استفاده کنید — سریع‌تر است.</li>
+    <li>از <code>$set</code> در update استفاده کنید — بدون آن، کل document جایگزین می‌شود.</li>
+    <li><strong>Index</strong> بسازید روی field‌هایی که زیاد query می‌شوند: <code>userSchema.index({ email: 1 })</code></li>
+    <li><strong>Populate</strong> مثل JOIN است ولی چند query به DB می‌زند — برای داده‌های کم مناسب است.</li>
+    <li>سوال رایج: «MongoDB چه زمانی مناسب‌تر از SQL است؟» — وقتی ساختار داده متغیر است یا nested پیچیده دارد (مثل یک پست با کامنت‌های تودرتو)؛ برای داده‌های رابطه‌ای سنگین با نیاز به transaction دقیق، SQL معمولاً بهتر است.</li>
+    <li>یک تله رایج: استفاده نکردن از index و بعد شکایت از کندی query روی جدول بزرگ — بدون index، MongoDB باید همه document‌ها را یکی‌یکی بررسی کند (collection scan).</li>
+    <li><strong>Embedding vs Referencing</strong>: داده‌ای که همیشه با هم خوانده می‌شود را embed کنید (مثل آدرس در user)؛ داده‌ای که مستقل رشد می‌کند یا در جاهای مختلف استفاده می‌شود را reference کنید (مثل پست‌های یک کاربر).</li>
+    <li>عملیات <strong>Aggregation Pipeline</strong> برای query‌های پیچیده (گروه‌بندی، محاسبه، join چندمرحله‌ای) استفاده می‌شود — قوی‌تر از find ساده است.</li>
+  </ul>
+
+  <div class="chapter-nav">
+    <a class="nav-btn" href="nodejs-course-chapter19.html">← فصل قبلی: Docker</a>
+    <a class="nav-btn next" href="nodejs-course-chapter21.html">فصل بعدی: Redis Basics →</a>
+  </div>
+</main>
+<script>
+function toggleMobileMenu(){
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('open');
+}
+// بستن منو با کلیک روی هر لینک فصل (تجربه بهتر در موبایل)
+document.querySelectorAll('.sidebar .nav-item').forEach(function(link){
+  link.addEventListener('click', function(){
+    document.querySelector('.sidebar').classList.remove('open');
+    document.getElementById('mobileOverlay').classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>دوره Node.js — فصل 64</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--border:#2a3347;--accent:#4ade80;--accent2:#22d3ee;--accent3:#a78bfa;--text:#e2e8f0;--text-muted:#8b9ab5;--text-dim:#4a5568;--code-bg:#0d1117}
+body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;display:flex;min-height:100vh;overflow-x:hidden}
+.sidebar{width:280px;min-width:280px;background:var(--bg2);border-left:1px solid var(--border);padding:2rem 0;position:fixed;right:0;top:0;height:100vh;overflow-y:auto;z-index:100}
+.sidebar-logo{padding:0 1.5rem 1.5rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+.sidebar-logo .logo-icon{width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem}
+.sidebar-logo h2{font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px}
+.sidebar-logo p{font-size:12px;color:var(--text-muted)}
+.nav-section-title{font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;padding:0 1.5rem;margin:1.25rem 0 0.5rem}
+.nav-item{display:flex;align-items:center;gap:0.6rem;padding:0.5rem 1.5rem;font-size:12.5px;color:var(--text-muted);cursor:pointer;border-right:3px solid transparent;transition:all 0.15s;text-decoration:none}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(74,222,128,0.08);color:var(--accent);border-right-color:var(--accent);font-weight:500}
+.nav-item .num{font-size:10px;background:var(--bg3);border-radius:4px;padding:1px 5px;min-width:22px;text-align:center;font-family:'Fira Code',monospace}
+.nav-item.active .num{background:rgba(74,222,128,0.15);color:var(--accent)}
+.main{margin-right:280px;flex:1;padding:3rem 3.5rem 5rem;max-width:860px}
+.chapter-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);border-radius:20px;padding:4px 14px;font-size:12px;color:var(--accent);margin-bottom:1rem;font-weight:500}
+h1.chapter-title{font-size:2.2rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:0.75rem}
+h1.chapter-title span{color:var(--accent)}
+.chapter-desc{font-size:16px;color:var(--text-muted);margin-bottom:2.5rem;max-width:600px}
+.divider{height:1px;background:var(--border);margin:2.5rem 0}
+h2.section-title{font-size:1.25rem;font-weight:700;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;gap:10px}
+h2.section-title::before{content:'';display:block;width:4px;height:22px;background:var(--accent);border-radius:2px}
+h3.sub-title{font-size:1rem;font-weight:700;color:var(--accent2);margin:1.5rem 0 0.6rem}
+p{color:var(--text-muted);font-size:15px;margin-bottom:1rem}
+strong{color:var(--text);font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:1rem 0}
+.tag{font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;font-family:'Fira Code',monospace}
+.tag.green{background:rgba(22,101,52,0.4);color:#86efac;border:1px solid rgba(134,239,172,0.2)}
+.tag.blue{background:rgba(30,58,95,0.6);color:#7dd3fc;border:1px solid rgba(125,211,252,0.2)}
+.tag.purple{background:rgba(59,31,110,0.6);color:#c4b5fd;border:1px solid rgba(196,181,253,0.2)}
+.tag.orange{background:rgba(180,83,9,0.4);color:#fdba74;border:1px solid rgba(253,186,116,0.2)}
+.code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:12px;margin:1.25rem 0;overflow:hidden;direction:ltr}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 1rem;background:var(--bg3);border-bottom:1px solid var(--border);direction:ltr}
+.code-header .dots{display:flex;gap:6px}
+.code-header .dot{width:10px;height:10px;border-radius:50%}
+.code-header .dot.red{background:#ff5f56}.code-header .dot.yellow{background:#ffbd2e}.code-header .dot.green{background:#27c93f}
+.code-header .filename{font-size:12px;color:var(--text-muted);font-family:'Fira Code',monospace}
+.code-body{padding:1.25rem 1.5rem;font-family:'Fira Code',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;white-space:pre;color:#e2e8f0;text-align:left;direction:ltr}
+.c-comment{color:#6b7e99}.c-keyword{color:#c084fc}.c-string{color:#86efac}.c-fn{color:#67e8f9}.c-num{color:#fb923c}.c-op{color:#94a3b8}.c-type{color:#fbbf24}.c-decorator{color:#fb923c}.c-cmd{color:#fbbf24}
+.note-box{background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.25);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0;display:flex;gap:0.75rem}
+.note-box p{color:var(--text-muted);font-size:14px;margin:0}
+.note-box strong{color:var(--accent2)}
+.warn-box{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0;display:flex;gap:0.75rem}
+.warn-box p{color:var(--text-muted);font-size:14px;margin:0}
+.warn-box strong{color:#fbbf24}
+.explain-box{background:var(--bg2);border-right:3px solid var(--accent3);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin:1rem 0}
+.explain-box p{font-size:14px;color:var(--text-muted);margin:0}
+.explain-box strong{color:var(--accent3)}
+.key-points{list-style:none;margin:1rem 0}
+.key-points li{display:flex;gap:0.75rem;align-items:flex-start;margin-bottom:0.75rem;font-size:14px;color:var(--text-muted)}
+.key-points li::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0;margin-top:2px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
+.cg-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem}
+.cg-card h4{font-size:14px;font-weight:700;margin-bottom:8px}
+.cg-card p{font-size:13px;color:var(--text-muted);margin:0 0 4px}
+.chapter-nav{display:flex;justify-content:space-between;margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border)}
+.nav-btn{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:14px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;font-family:'Vazirmatn',sans-serif}
+.nav-btn:hover{border-color:var(--accent);color:var(--accent)}
+.nav-btn.next{background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.3);color:var(--accent)}
+
+
+
+
+  /* --- Fix: راست‌چین کردن کامنت‌های فارسی داخل بلوک کد --- */
+  .c-comment{unicode-bidi:isolate;direction:rtl}
+
+  /* --- Fix: ریسپانسیو کامل --- */
+  @media(max-width:1024px){
+    .main{margin-right:240px;padding:2rem}
+    .sidebar{width:240px;min-width:240px}
+  }
+  @media(max-width:900px){
+    body{display:block}
+    .main{margin-right:0;padding:1.25rem;max-width:100%}
+    h1.chapter-title{font-size:1.6rem}
+    .chapter-desc{font-size:14px}
+    /* Safety net: هر گرید یا فلکس چندستونه در موبایل تک‌ستونی و ایمن شود */
+    .compare-grid,.cg-card,.use-cases,.pattern-grid,.arch-grid,
+    .branch-grid,.cmd-grid,.range-grid,.module-compare,.pillar-grid,
+    .test-types,.ts-benefits,.compare-row,.error-types{grid-template-columns:1fr!important}
+    .semver-box,.di-diagram,.git-states,.tdd-cycle,.ws-clients,.flow-row{flex-wrap:wrap!important}
+    .git-state,.tdd-step{flex:1 1 100%!important;min-width:0!important}
+    .code-body{font-size:12px;padding:1rem}
+    .chapter-nav{flex-direction:column;gap:10px}
+    .nav-btn{width:100%;justify-content:center;text-align:center}
+    .tags{gap:6px}
+    .tag{font-size:11px;padding:3px 10px}
+  }
+  @media(max-width:480px){
+    .main{padding:1rem}
+    h1.chapter-title{font-size:1.35rem}
+    .code-body{font-size:11px;padding:0.75rem}
+    .code-header .filename{font-size:10px}
+    .chapter-badge{font-size:11px;padding:3px 10px}
+  }
+  /* دکمه‌های قبلی/بعدی حالا لینک هستند نه button - استایل یکسان بماند */
+  a.nav-btn{text-decoration:none}
+  a.nav-btn.disabled{opacity:0.4;pointer-events:none;cursor:default}
+
+  /* --- Fix: دکمه همبرگری و منوی موبایل --- */
+  .mobile-menu-btn{
+    display:none;
+    position:fixed;
+    top:16px;
+    right:16px;
+    z-index:200;
+    width:44px;
+    height:44px;
+    background:var(--bg2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+  }
+  .mobile-menu-btn svg{width:22px;height:22px;stroke:var(--accent)}
+  .mobile-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    z-index:150;
+  }
+  .mobile-overlay.open{display:block}
+
+  @media(max-width:900px){
+    .mobile-menu-btn{display:flex}
+    .sidebar{
+      display:flex!important;
+      flex-direction:column;
+      transform:translateX(100%);
+      transition:transform 0.25s ease;
+      z-index:180;
+      box-shadow:-4px 0 20px rgba(0,0,0,0.4);
+    }
+    .sidebar.open{transform:translateX(0)}
+    .main{padding-top:4.5rem}
+  }
+
+</style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="باز کردن منو">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+</button>
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0f1117" stroke-width="2.5" stroke-linecap="round" width="22" height="22"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+    <h2>دوره Node.js</h2><p>۶۳ فصل — مقدماتی تا پیشرفته</p>
+  </div>
+  <div class="nav-section-title">بخش مقدماتی</div>
+  <a class="nav-item" href="nodejs-course-chapter1.html"><span class="num">01</span> معماری و تاریخچه</a>
+  <a class="nav-item" href="nodejs-course-chapter2.html"><span class="num">02</span> توسعه روی Linux</a>
+  <a class="nav-item" href="nodejs-course-chapter3.html"><span class="num">03</span> NPM و ماژول‌ها</a>
+  <a class="nav-item" href="nodejs-course-chapter4.html"><span class="num">04</span> Semantic Versioning</a>
+  <a class="nav-item" href="nodejs-course-chapter5.html"><span class="num">05</span> Git Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter6.html"><span class="num">06</span> Git Flow</a>
+  <a class="nav-item" href="nodejs-course-chapter7.html"><span class="num">07</span> Github</a>
+  <a class="nav-item" href="nodejs-course-chapter8.html"><span class="num">08</span> Testing & TDD</a>
+  <a class="nav-item" href="nodejs-course-chapter9.html"><span class="num">09</span> JS Fundamentals</a>
+  <a class="nav-item" href="nodejs-course-chapter10.html"><span class="num">10</span> OOP</a>
+  <a class="nav-item" href="nodejs-course-chapter11.html"><span class="num">11</span> Advanced JS</a>
+  <a class="nav-item" href="nodejs-course-chapter12.html"><span class="num">12</span> TypeScript</a>
+  <a class="nav-item" href="nodejs-course-chapter13.html"><span class="num">13</span> Error Handling</a>
+  <a class="nav-item" href="nodejs-course-chapter14.html"><span class="num">14</span> Async Programming</a>
+  <a class="nav-item" href="nodejs-course-chapter15.html"><span class="num">15</span> Non-Blocking & Concurrency</a>
+  <a class="nav-item" href="nodejs-course-chapter16.html"><span class="num">16</span> Async Flow Control</a>
+  <a class="nav-item" href="nodejs-course-chapter17.html"><span class="num">17</span> Web Server (Fastify)</a>
+  <a class="nav-item" href="nodejs-course-chapter18.html"><span class="num">18</span> Chat Server</a>
+  <a class="nav-item" href="nodejs-course-chapter19.html"><span class="num">19</span> Docker</a>
+  <a class="nav-item" href="nodejs-course-chapter20.html"><span class="num">20</span> MongoDB</a>
+  <a class="nav-item" href="nodejs-course-chapter21.html"><span class="num">21</span> Redis Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter22.html"><span class="num">22</span> Frameworks & IOC</a>
+  <a class="nav-item" href="nodejs-course-chapter23.html"><span class="num">23</span> NestJS</a>
+  <div class="nav-section-title">بخش پیشرفته</div>
+  <a class="nav-item" href="nodejs-course-chapter24.html"><span class="num">24</span> Currying & Composition</a>
+  <a class="nav-item" href="nodejs-course-chapter25.html"><span class="num">25</span> Isomorphic & Idempotent</a>
+  <a class="nav-item" href="nodejs-course-chapter26.html"><span class="num">26</span> Functional Data Modeling</a>
+  <a class="nav-item" href="nodejs-course-chapter27.html"><span class="num">27</span> Zod</a>
+  <a class="nav-item" href="nodejs-course-chapter28.html"><span class="num">28</span> SOLID</a>
+  <a class="nav-item" href="nodejs-course-chapter29.html"><span class="num">29</span> GoF Design Patterns</a>
+  <a class="nav-item" href="nodejs-course-chapter30.html"><span class="num">30</span> Refactoring</a>
+  <a class="nav-item" href="nodejs-course-chapter31.html"><span class="num">31</span> Event Emitter</a>
+  <a class="nav-item" href="nodejs-course-chapter32.html"><span class="num">32</span> Pub/Sub (Cluster)</a>
+  <a class="nav-item" href="nodejs-course-chapter33.html"><span class="num">33</span> Queues & Brokers</a>
+  <a class="nav-item" href="nodejs-course-chapter34.html"><span class="num">34</span> Working with Streams</a>
+  <a class="nav-item" href="nodejs-course-chapter35.html"><span class="num">35</span> Custom Streams & Generators</a>
+  <a class="nav-item" href="nodejs-course-chapter36.html"><span class="num">36</span> RxJS</a>
+  <a class="nav-item" href="nodejs-course-chapter37.html"><span class="num">37</span> 12 Factor App</a>
+  <a class="nav-item" href="nodejs-course-chapter38.html"><span class="num">38</span> Resilience Patterns</a>
+  <a class="nav-item" href="nodejs-course-chapter39.html"><span class="num">39</span> Postgres Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter40.html"><span class="num">40</span> TypeORM</a>
+  <a class="nav-item" href="nodejs-course-chapter41.html"><span class="num">41</span> TS: Thinking in Types</a>
+  <a class="nav-item" href="nodejs-course-chapter42.html"><span class="num">42</span> Web Frameworks Compare</a>
+  <a class="nav-item" href="nodejs-course-chapter43.html"><span class="num">43</span> Onion & Clean Architecture</a>
+  <a class="nav-item" href="nodejs-course-chapter44.html"><span class="num">44</span> Microservices Patterns</a>
+  <div class="nav-section-title">بخش تکمیلی</div>
+  <a class="nav-item" href="nodejs-course-chapter45.html"><span class="num">45</span> Authentication (JWT)</a>
+  <a class="nav-item" href="nodejs-course-chapter46.html"><span class="num">46</span> Authorization & RBAC</a>
+  <a class="nav-item" href="nodejs-course-chapter47.html"><span class="num">47</span> Security Essentials</a>
+  <a class="nav-item" href="nodejs-course-chapter48.html"><span class="num">48</span> Caching Strategies</a>
+  <a class="nav-item" href="nodejs-course-chapter49.html"><span class="num">49</span> API Design</a>
+  <a class="nav-item" href="nodejs-course-chapter50.html"><span class="num">50</span> Monitoring & Observability</a>
+  <a class="nav-item" href="nodejs-course-chapter51.html"><span class="num">51</span> Advanced Testing</a>
+  <a class="nav-item" href="nodejs-course-chapter52.html"><span class="num">52</span> Node.js Internals & Memory</a>
+  <a class="nav-item" href="nodejs-course-chapter53.html"><span class="num">53</span> Serverless (AWS Lambda)</a>
+  <a class="nav-item" href="nodejs-course-chapter54.html"><span class="num">54</span> CI/CD Pipeline کامل</a>
+  <div class="nav-section-title">بخش عملی نهایی</div>
+  <a class="nav-item" href="nodejs-course-chapter55.html"><span class="num">55</span> PM2 & Process Management</a>
+  <a class="nav-item" href="nodejs-course-chapter56.html"><span class="num">56</span> File Upload & Streaming</a>
+  <a class="nav-item" href="nodejs-course-chapter57.html"><span class="num">57</span> Webhooks</a>
+  <a class="nav-item" href="nodejs-course-chapter58.html"><span class="num">58</span> Cron & Scheduled Tasks</a>
+  <a class="nav-item" href="nodejs-course-chapter59.html"><span class="num">59</span> npm Monorepo & Workspaces</a>
+  <a class="nav-item" href="nodejs-course-chapter60.html"><span class="num">60</span> Config Validation & Feature Flags</a>
+  <a class="nav-item" href="nodejs-course-chapter61.html"><span class="num">61</span> gRPC</a>
+  <div class="nav-section-title">تمرکز ویژه مصاحبه</div>
+  <a class="nav-item" href="nodejs-course-chapter62.html"><span class="num">62</span> Express.js عمیق</a>
+  <a class="nav-item" href="nodejs-course-chapter63.html"><span class="num">63</span> NestJS پیشرفته</a>
+  <a class="nav-item active" href="nodejs-course-chapter64.html"><span class="num">64</span> OOP کامل و Decorators</a>
+</aside>
+<main class="main">
+  <div class="chapter-badge"><span>●</span> فصل شصت و چهارم — تمرکز مصاحبه</div>
+  <h1 class="chapter-title">OOP کامل<br/><span>و Decorators</span></h1>
+  <p class="chapter-desc">مرور کامل و ساده مفاهیم OOP در TypeScript — از Interface و Abstract Class تا Polymorphism، به‌همراه یک بخش کامل درباره Decorators که پایه معماری NestJS است.</p>
+  <div class="tags"><span class="tag green">Interface</span><span class="tag blue">Abstract Class</span><span class="tag purple">Polymorphism</span><span class="tag green">extends</span><span class="tag blue">implements</span><span class="tag purple">Decorators</span></div>
+  <div class="divider"></div>
+
+  <h2 class="section-title">چرا یک فصل کامل دیگر برای OOP؟</h2>
+  <p>
+    در فصل ۱۰ با مبانی class، constructor، inheritance و private field در جاوااسکریپت آشنا شدیم.
+    اما جاوااسکریپت خالص چند مفهوم مهم OOP (مثل <strong>Interface</strong> و <strong>Abstract Class</strong>) را ندارد —
+    این‌ها فقط در <strong>TypeScript</strong> معنا پیدا می‌کنند. چون این مفاهیم پایه NestJS و پروژه‌های
+    حرفه‌ای Node.js هستند، در این فصل همه را از صفر و به‌صورت کامل، ساده و روان مرور می‌کنیم.
+  </p>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">چهار اصل OOP — یادآوری سریع و ساده</h2>
+  <p>پیش از ورود به syntax، این چهار اصل را با مثال‌های خیلی ساده مرور می‌کنیم:</p>
+
+  <div class="compare-grid">
+    <div class="cg-card">
+      <h4 style="color:var(--accent)">Encapsulation (کپسوله‌سازی)</h4>
+      <p>پنهان کردن جزئیات داخلی — مثل ریموت کنترل تلویزیون: شما فقط دکمه را می‌زنید، نمی‌دانید داخلش چه اتفاقی می‌افتد.</p>
+    </div>
+    <div class="cg-card">
+      <h4 style="color:var(--accent2)">Inheritance (وراثت)</h4>
+      <p>یک کلاس ویژگی‌های کلاس دیگر را به ارث می‌برد — مثل فرزندی که رفتار پایه‌ای از والدینش می‌گیرد.</p>
+    </div>
+    <div class="cg-card">
+      <h4 style="color:var(--accent3)">Polymorphism (چندریختی)</h4>
+      <p>یک اسم متد، رفتار متفاوت در کلاس‌های مختلف — مثل دکمه «پخش» که در تلویزیون و پخش‌کننده موزیک کار متفاوتی می‌کند.</p>
+    </div>
+    <div class="cg-card">
+      <h4 style="color:#fbbf24">Abstraction (انتزاع)</h4>
+      <p>نشان دادن فقط چیزهای ضروری — مثل رانندگی ماشین: فقط فرمان و پدال را می‌شناسید، نه موتور داخلش را.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Class و Constructor — یادآوری پایه</h2>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">class-basics.ts</span></div>
+    <div class="code-body"><span class="c-keyword">class</span> <span class="c-fn">Animal</span> {
+  <span class="c-comment">// property ها — چیزهایی که هر Animal دارد</span>
+  name: <span class="c-type">string</span>;
+  age: <span class="c-type">number</span>;
+
+  <span class="c-comment">// constructor — وقتی new Animal() صدا زده می‌شود، این تابع اجرا می‌شود</span>
+  <span class="c-keyword">constructor</span>(name: <span class="c-type">string</span>, age: <span class="c-type">number</span>) {
+    <span class="c-keyword">this</span>.name = name;
+    <span class="c-keyword">this</span>.age = age;
+  }
+
+  <span class="c-comment">// method — کاری که هر Animal می‌تواند انجام دهد</span>
+  <span class="c-fn">makeSound</span>(): <span class="c-type">string</span> {
+    <span class="c-keyword">return</span> <span class="c-string">'صدای نامشخص'</span>;
+  }
+
+  <span class="c-fn">describe</span>(): <span class="c-type">string</span> {
+    <span class="c-keyword">return</span> <span class="c-string">`${this.name}، ${this.age} ساله`</span>;
+  }
+}
+
+<span class="c-comment">// instance — یک نمونه واقعی از کلاس Animal</span>
+<span class="c-keyword">const</span> myPet = <span class="c-keyword">new</span> <span class="c-fn">Animal</span>(<span class="c-string">'ببر'</span>, <span class="c-num">3</span>);
+console.<span class="c-fn">log</span>(myPet.<span class="c-fn">describe</span>()); <span class="c-comment">// "ببر، 3 ساله"</span></div>
+  </div>
+
+  <div class="explain-box">
+    <p><strong>تشبیه ساده:</strong> <strong>Class</strong> مثل نقشه یک ساختمان است — فقط طرح روی کاغذ. <strong>Instance</strong> (با new ساخته می‌شود) خود ساختمان واقعی است که از روی آن نقشه ساخته شده. از یک نقشه می‌توانید چندین ساختمان (instance) بسازید.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">extends — وراثت بین کلاس‌ها</h2>
+  <p>
+    <strong>extends</strong> یعنی یک کلاس، همه چیزهای کلاس دیگر را می‌گیرد و می‌تواند چیز جدید هم اضافه کند
+    یا رفتار قبلی را تغییر دهد. کلاس اصلی را <strong>Parent/Base/Super</strong> و کلاس جدید را
+    <strong>Child/Derived/Sub</strong> می‌نامند.
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">extends-basics.ts</span></div>
+    <div class="code-body"><span class="c-keyword">class</span> <span class="c-fn">Animal</span> {
+  <span class="c-keyword">constructor</span>(<span class="c-keyword">public</span> name: <span class="c-type">string</span>) {} <span class="c-comment">// این خط کوتاه‌شده همان this.name = name است</span>
+
+  <span class="c-fn">makeSound</span>(): <span class="c-type">string</span> {
+    <span class="c-keyword">return</span> <span class="c-string">'صدای نامشخص'</span>;
+  }
+}
+
+<span class="c-comment">// Dog از Animal ارث می‌برد — پس Dog همه چیز Animal را دارد</span>
+<span class="c-keyword">class</span> <span class="c-fn">Dog</span> <span class="c-keyword">extends</span> <span class="c-fn">Animal</span> {
+  <span class="c-keyword">constructor</span>(name: <span class="c-type">string</span>, <span class="c-keyword">public</span> breed: <span class="c-type">string</span>) {
+    <span class="c-keyword">super</span>(name); <span class="c-comment">// حتماً باید اول super() صدا زده شود — constructor والد را اجرا می‌کند</span>
+  }
+
+  <span class="c-comment">// override — بازنویسی متد makeSound که از Animal آمده</span>
+  <span class="c-fn">makeSound</span>(): <span class="c-type">string</span> {
+    <span class="c-keyword">return</span> <span class="c-string">'واق واق!'</span>;
+  }
+
+  <span class="c-comment">// متد جدید که فقط Dog دارد، Animal ندارد</span>
+  <span class="c-fn">fetch</span>(): <span class="c-type">string</span> {
+    <span class="c-keyword">return</span> <span class="c-string">`${this.name} توپ را آورد`</span>;
+  }
+}
+
+<span class="c-keyword">const</span> myDog = <span class="c-keyword">new</span> <span class="c-fn">Dog</span>(<span class="c-string">'رکس'</span>, <span class="c-string">'ژرمن شپرد'</span>);
+console.<span class="c-fn">log</span>(myDog.<span class="c-fn">makeSound</span>()); <span class="c-comment">// "واق واق!" — نسخه Dog اجرا شد، نه Animal</span>
+console.<span class="c-fn">log</span>(myDog.<span class="c-fn">fetch</span>());     <span class="c-comment">// "رکس توپ را آورد"</span>
+console.<span class="c-fn">log</span>(myDog <span class="c-keyword">instanceof</span> Animal); <span class="c-comment">// true — Dog در واقع یک Animal هم هست</span></div>
+  </div>
+
+  <div class="warn-box">
+    <span style="font-size:18px;flex-shrink:0">⚠️</span>
+    <p><strong>قانون طلایی super():</strong> اگر constructor در کلاس فرزند تعریف کرده باشید، باید همیشه اولین خطش <code>super(...)</code> باشد — قبل از استفاده از this. بدون این، جاوااسکریپت خطا می‌دهد چون هنوز this ساخته نشده.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Access Modifiers — کنترل دسترسی به property و متد</h2>
+  <p>
+    <strong>Access Modifier</strong> مشخص می‌کند یک property یا متد از کجا قابل دسترسی است — این همان
+    اصل <strong>Encapsulation</strong> است که در ابتدای فصل دیدیم، ولی حالا با syntax واقعی. TypeScript
+    چهار سطح دسترسی دارد:
+  </p>
+
+  <div class="compare-grid">
+    <div class="cg-card">
+      <h4 style="color:var(--accent)">public (پیش‌فرض)</h4>
+      <p>از همه‌جا قابل دسترسی — داخل کلاس، فرزندان، و بیرون از کلاس. اگر چیزی ننویسید، همین است.</p>
+    </div>
+    <div class="cg-card">
+      <h4 style="color:#f87171">private</h4>
+      <p>فقط داخل همان کلاس قابل دسترسی — حتی کلاس فرزند هم نمی‌تواند مستقیم به آن دسترسی داشته باشد.</p>
+    </div>
+    <div class="cg-card">
+      <h4 style="color:var(--accent2)">protected</h4>
+      <p>داخل کلاس و همه کلاس‌های فرزند قابل دسترسی — ولی از بیرون (خارج از خانواده کلاس) قابل دسترسی نیست.</p>
+    </div>
+    <div class="cg-card">
+      <h4 style="color:var(--accent3)">readonly</h4>
+      <p>فقط یک بار (در constructor) قابل مقداردهی — بعد از آن دیگر قابل تغییر نیست.</p>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">access-modifiers.ts</span></div>
+    <div class="code-body"><span class="c-keyword">class</span> <span class="c-fn">BankAccount</span> {
+  <span class="c-keyword">public</span> owner: <span class="c-type">string</span>;        <span class="c-comment">// همه‌جا قابل دسترسی (پیش‌فرض هم همین است)</span>
+  <span class="c-keyword">private</span> balance: <span class="c-type">number</span>;     <span class="c-comment">// فقط داخل خود این کلاس</span>
+  <span class="c-keyword">protected</span> accountType: <span class="c-type">string</span>; <span class="c-comment">// داخل این کلاس و فرزندانش</span>
+  <span class="c-keyword">readonly</span> accountNumber: <span class="c-type">string</span>; <span class="c-comment">// فقط یک بار مقداردهی می‌شود</span>
+
+  <span class="c-keyword">constructor</span>(owner: <span class="c-type">string</span>, initialBalance: <span class="c-type">number</span>) {
+    <span class="c-keyword">this</span>.owner         = owner;
+    <span class="c-keyword">this</span>.balance       = initialBalance;
+    <span class="c-keyword">this</span>.accountType   = <span class="c-string">'عادی'</span>;
+    <span class="c-keyword">this</span>.accountNumber = <span class="c-string">`ACC-${Date.now()}`</span>;
+  }
+
+  <span class="c-comment">// یک متد public که به balance خصوصی دسترسی امن می‌دهد</span>
+  <span class="c-fn">getBalance</span>(): <span class="c-type">number</span> {
+    <span class="c-keyword">return this</span>.balance; <span class="c-comment">// از داخل خود کلاس، دسترسی به private آزاد است</span>
+  }
+
+  <span class="c-fn">deposit</span>(amount: <span class="c-type">number</span>): <span class="c-type">void</span> {
+    <span class="c-keyword">if</span> (amount <= <span class="c-num">0</span>) <span class="c-keyword">throw new</span> <span class="c-fn">Error</span>(<span class="c-string">'مبلغ باید مثبت باشد'</span>);
+    <span class="c-keyword">this</span>.balance += amount;
+  }
+}
+
+<span class="c-keyword">const</span> account = <span class="c-keyword">new</span> <span class="c-fn">BankAccount</span>(<span class="c-string">'Ali'</span>, <span class="c-num">1000</span>);
+
+console.<span class="c-fn">log</span>(account.owner);         <span class="c-comment">// ✅ درست — public است</span>
+console.<span class="c-fn">log</span>(account.<span class="c-fn">getBalance</span>());  <span class="c-comment">// ✅ درست — از طریق متد public</span>
+
+<span class="c-comment">// account.balance;                 // ❌ خطای کامپایل — private است، از بیرون در دسترس نیست
+// account.accountNumber = 'X';    // ❌ خطای کامپایل — readonly است، تغییر ممکن نیست</span></div>
+  </div>
+
+  <h3 class="sub-title">protected در عمل — تفاوت با private</h3>
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">protected-vs-private.ts</span></div>
+    <div class="code-body"><span class="c-keyword">class</span> <span class="c-fn">Employee</span> {
+  <span class="c-keyword">protected</span> salary: <span class="c-type">number</span>; <span class="c-comment">// فرزندان می‌توانند ببینند، بیرون نه</span>
+  <span class="c-keyword">private</span> ssn: <span class="c-type">string</span>;      <span class="c-comment">// حتی فرزندان هم نمی‌توانند مستقیم ببینند</span>
+
+  <span class="c-keyword">constructor</span>(salary: <span class="c-type">number</span>, ssn: <span class="c-type">string</span>) {
+    <span class="c-keyword">this</span>.salary = salary;
+    <span class="c-keyword">this</span>.ssn    = ssn;
+  }
+}
+
+<span class="c-keyword">class</span> <span class="c-fn">Manager</span> <span class="c-keyword">extends</span> <span class="c-fn">Employee</span> {
+  <span class="c-fn">giveRaise</span>(amount: <span class="c-type">number</span>) {
+    <span class="c-keyword">this</span>.salary += amount; <span class="c-comment">// ✅ درست — protected از فرزند قابل دسترسی است</span>
+    <span class="c-comment">// this.ssn;                // ❌ خطا — private حتی از فرزند هم در دسترس نیست</span>
+  }
+}
+
+<span class="c-keyword">const</span> manager = <span class="c-keyword">new</span> <span class="c-fn">Manager</span>(<span class="c-num">50000</span>, <span class="c-string">'123-45-6789'</span>);
+<span class="c-comment">// manager.salary;   // ❌ خطا — از بیرون کلاس (حتی فرزند) به protected دسترسی نیست</span></div>
+  </div>
+
+  <h3 class="sub-title">میان‌بر رایج — تعریف Access Modifier مستقیم در Constructor</h3>
+  <p>
+    یکی از ویژگی‌های محبوب TypeScript این است که می‌توانید access modifier را مستقیم پشت پارامتر
+    constructor بنویسید — این هم property را تعریف می‌کند هم مقداردهی می‌کند، در یک خط:
+  </p>
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">constructor-shorthand.ts</span></div>
+    <div class="code-body"><span class="c-comment">// ❌ روش طولانی — تعریف جدا + مقداردهی جدا</span>
+<span class="c-keyword">class</span> <span class="c-fn">Product</span> {
+  <span class="c-keyword">private</span> name: <span class="c-type">string</span>;
+  <span class="c-keyword">private</span> price: <span class="c-type">number</span>;
+
+  <span class="c-keyword">constructor</span>(name: <span class="c-type">string</span>, price: <span class="c-type">number</span>) {
+    <span class="c-keyword">this</span>.name  = name;
+    <span class="c-keyword">this</span>.price = price;
+  }
+}
+
+<span class="c-comment">// ✅ روش کوتاه — یک خط برای هر پارامتر، همه چیز خودکار</span>
+<span class="c-keyword">class</span> <span class="c-fn">Product</span> {
+  <span class="c-keyword">constructor</span>(
+    <span class="c-keyword">private</span> name: <span class="c-type">string</span>,
+    <span class="c-keyword">private</span> price: <span class="c-type">number</span>,
+    <span class="c-keyword">public</span> readonly sku: <span class="c-type">string</span> <span class="c-comment">// می‌توانید چند modifier را با هم ترکیب کنید</span>
+  ) {}
+  <span class="c-comment">// همین! TypeScript خودش property و مقداردهی را می‌سازد</span>
+}
+
+<span class="c-comment">// این دقیقاً همان چیزی است که در فصل NestJS (23 و 63) همه‌جا دیدیم:
+// constructor(private usersService: UsersService) {}</span></div>
+  </div>
+
+  <div class="warn-box">
+    <span style="font-size:18px;flex-shrink:0">⚠️</span>
+    <p><strong>نکته مهم:</strong> این access modifier ها فقط در زمان <strong>کامپایل TypeScript</strong> چک می‌شوند. بعد از تبدیل به جاوااسکریپت خام، هیچ private/protected واقعی وجود ندارد — با کمی تلاش (مثل <code>(obj as any).balance</code>) هنوز می‌توان به آن‌ها دسترسی داشت. برای private واقعی که حتی در runtime هم محافظت‌شده باشد، باید از <strong>#privateField</strong> جاوااسکریپت (که در فصل ۱۰ دیدیم) استفاده کرد.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Interface — قرارداد شکل داده</h2>
+  <p>
+    <strong>Interface</strong> فقط در TypeScript وجود دارد (در جاوااسکریپت خالص نیست). Interface می‌گوید
+    «هر چیزی که از این نوع باشد، باید این ویژگی‌ها و متدها را داشته باشد» — ولی خودش هیچ کد اجرایی ندارد،
+    فقط یک <strong>قرارداد (contract)</strong> است.
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">interface-basics.ts</span></div>
+    <div class="code-body"><span class="c-comment">// تعریف یک interface — فقط شکل را مشخص می‌کند، هیچ پیاده‌سازی ندارد</span>
+<span class="c-keyword">interface</span> <span class="c-type">Flyable</span> {
+  maxAltitude: <span class="c-type">number</span>; <span class="c-comment">// property الزامی</span>
+  fly(): <span class="c-type">string</span>;         <span class="c-comment">// متدی که هر پیاده‌کننده باید داشته باشد</span>
+}
+
+<span class="c-keyword">interface</span> <span class="c-type">Swimmable</span> {
+  maxDepth: <span class="c-type">number</span>;
+  swim(): <span class="c-type">string</span>;
+}
+
+<span class="c-comment">// یک interface می‌تواند شکل کامل یک object هم باشد</span>
+<span class="c-keyword">interface</span> <span class="c-type">User</span> {
+  id: <span class="c-type">string</span>;
+  name: <span class="c-type">string</span>;
+  email: <span class="c-type">string</span>;
+  age?: <span class="c-type">number</span>; <span class="c-comment">// ? یعنی اختیاری است</span>
+}
+
+<span class="c-comment">// استفاده ساده — هر object که این شکل را داشته باشد، معتبر است</span>
+<span class="c-keyword">function</span> <span class="c-fn">printUser</span>(user: <span class="c-type">User</span>) {
+  console.<span class="c-fn">log</span>(<span class="c-string">`${user.name} (${user.email})`</span>);
+}
+
+printUser({ id: <span class="c-string">'1'</span>, name: <span class="c-string">'Ali'</span>, email: <span class="c-string">'ali@test.com'</span> }); <span class="c-comment">// درست — age اختیاری بود</span></div>
+  </div>
+
+  <div class="explain-box">
+    <p><strong>تشبیه ساده:</strong> Interface مثل یک فرم استخدامی است که می‌گوید «هر متقاضی باید نام، سن، و مدرک تحصیلی داشته باشد» — خودش کسی را استخدام نمی‌کند، فقط شرایط لازم را مشخص می‌کند. هر کسی که این شرایط را داشته باشد، «واجد شرایط» است.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">implements — پیاده‌سازی یک Interface</h2>
+  <p>
+    وقتی یک کلاس <strong>implements</strong> یک interface را دارد، یعنی متعهد می‌شود همه چیزهایی
+    که در آن interface تعریف شده را واقعاً پیاده‌سازی کند. اگر چیزی کم باشد، TypeScript خطا می‌دهد.
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">implements-basics.ts</span></div>
+    <div class="code-body"><span class="c-keyword">interface</span> <span class="c-type">Flyable</span> {
+  maxAltitude: <span class="c-type">number</span>;
+  fly(): <span class="c-type">string</span>;
+}
+
+<span class="c-comment">// Bird متعهد می‌شود همه چیزهای Flyable را داشته باشد</span>
+<span class="c-keyword">class</span> <span class="c-fn">Bird</span> <span class="c-keyword">implements</span> <span class="c-type">Flyable</span> {
+  maxAltitude = <span class="c-num">3000</span>; <span class="c-comment">// اجباری — چون در Flyable تعریف شده بود</span>
+
+  <span class="c-fn">fly</span>(): <span class="c-type">string</span> { <span class="c-comment">// اجباری — چون در Flyable تعریف شده بود</span>
+    <span class="c-keyword">return</span> <span class="c-string">'پرنده در حال پرواز'</span>;
+  }
+}
+
+<span class="c-comment">// یک کلاس می‌تواند چند interface را همزمان implement کند</span>
+<span class="c-keyword">class</span> <span class="c-fn">Duck</span> <span class="c-keyword">implements</span> <span class="c-type">Flyable</span>, <span class="c-type">Swimmable</span> {
+  maxAltitude = <span class="c-num">500</span>;
+  maxDepth    = <span class="c-num">2</span>;
+
+  <span class="c-fn">fly</span>():  <span class="c-type">string</span> { <span class="c-keyword">return</span> <span class="c-string">'اردک در حال پرواز'</span>; }
+  <span class="c-fn">swim</span>(): <span class="c-type">string</span> { <span class="c-keyword">return</span> <span class="c-string">'اردک در حال شنا'</span>; }
+}
+
+<span class="c-comment">// ❌ اگر یک متد را فراموش کنید، TypeScript همان لحظه خطا می‌دهد:</span>
+<span class="c-comment">// class Penguin implements Flyable {
+//   maxAltitude = 0;
+//   // Error: Property 'fly' is missing
+// }</span></div>
+  </div>
+
+  <h3 class="sub-title">تفاوت extends و implements — سوالی که همیشه گیج‌کننده است</h3>
+  <div class="compare-grid">
+    <div class="cg-card">
+      <h4 style="color:var(--accent)">extends</h4>
+      <p>ارث بردن <strong>کد واقعی</strong> از یک کلاس — property ها و متدها با پیاده‌سازی کامل منتقل می‌شوند. فقط از یک کلاس (single inheritance).</p>
+    </div>
+    <div class="cg-card">
+      <h4 style="color:var(--accent2)">implements</h4>
+      <p>متعهد شدن به یک <strong>قرارداد شکل</strong> — خودتان باید همه چیز را از صفر بنویسید. می‌توانید چند interface را همزمان implement کنید.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Abstract Class — نیمه‌کاره و اجباری</h2>
+  <p>
+    <strong>Abstract Class</strong> ترکیبی از class معمولی و interface است — می‌تواند هم متد با
+    پیاده‌سازی کامل داشته باشد (مثل class عادی)، هم متد <strong>abstract</strong> بدون پیاده‌سازی
+    که کلاس‌های فرزند مجبورند خودشان بنویسند. مهم‌ترین تفاوت با interface: <strong>نمی‌توانید مستقیم
+    از یک Abstract Class نمونه (instance) بسازید.</strong>
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">abstract-class.ts</span></div>
+    <div class="code-body"><span class="c-keyword">abstract class</span> <span class="c-fn">Shape</span> {
+  <span class="c-keyword">constructor</span>(<span class="c-keyword">public</span> color: <span class="c-type">string</span>) {}
+
+  <span class="c-comment">// متد معمولی با پیاده‌سازی کامل — همه فرزندان همین را استفاده می‌کنند</span>
+  <span class="c-fn">describe</span>(): <span class="c-type">string</span> {
+    <span class="c-keyword">return</span> <span class="c-string">`یک شکل ${this.color} با مساحت ${this.calculateArea()}`</span>;
+  }
+
+  <span class="c-comment">// متد abstract — فقط امضا دارد، بدون بدنه. هر فرزند مجبور است خودش بنویسد</span>
+  <span class="c-keyword">abstract</span> <span class="c-fn">calculateArea</span>(): <span class="c-type">number</span>;
+}
+
+<span class="c-comment">// ❌ خطا — نمی‌توانید مستقیم از abstract class نمونه بسازید:
+// const s = new Shape('red'); // Error!</span>
+
+<span class="c-keyword">class</span> <span class="c-fn">Circle</span> <span class="c-keyword">extends</span> <span class="c-fn">Shape</span> {
+  <span class="c-keyword">constructor</span>(color: <span class="c-type">string</span>, <span class="c-keyword">private</span> radius: <span class="c-type">number</span>) {
+    <span class="c-keyword">super</span>(color);
+  }
+
+  <span class="c-comment">// اجباری — چون Shape این متد را abstract تعریف کرده بود</span>
+  <span class="c-fn">calculateArea</span>(): <span class="c-type">number</span> {
+    <span class="c-keyword">return</span> Math.PI * <span class="c-keyword">this</span>.radius ** <span class="c-num">2</span>;
+  }
+}
+
+<span class="c-keyword">class</span> <span class="c-fn">Rectangle</span> <span class="c-keyword">extends</span> <span class="c-fn">Shape</span> {
+  <span class="c-keyword">constructor</span>(color: <span class="c-type">string</span>, <span class="c-keyword">private</span> width: <span class="c-type">number</span>, <span class="c-keyword">private</span> height: <span class="c-type">number</span>) {
+    <span class="c-keyword">super</span>(color);
+  }
+
+  <span class="c-fn">calculateArea</span>(): <span class="c-type">number</span> {
+    <span class="c-keyword">return this</span>.width * <span class="c-keyword">this</span>.height;
+  }
+}
+
+<span class="c-keyword">const</span> circle = <span class="c-keyword">new</span> <span class="c-fn">Circle</span>(<span class="c-string">'قرمز'</span>, <span class="c-num">5</span>);
+console.<span class="c-fn">log</span>(circle.<span class="c-fn">describe</span>()); <span class="c-comment">// از متد مشترک Shape استفاده می‌کند، ولی calculateArea مخصوص Circle است</span></div>
+  </div>
+
+  <h3 class="sub-title">Interface یا Abstract Class؟ — تصمیم عملی</h3>
+  <div class="note-box">
+    <span style="font-size:18px;flex-shrink:0">💡</span>
+    <p>اگر فقط می‌خواهید <strong>شکل</strong> را مشخص کنید و هیچ کد مشترکی بین پیاده‌کننده‌ها نیست، از <strong>Interface</strong> استفاده کنید. اگر می‌خواهید هم شکل را مشخص کنید هم مقداری <strong>کد مشترک واقعی</strong> بین همه فرزندان به اشتراک بگذارید (مثل متد describe در مثال بالا)، از <strong>Abstract Class</strong> استفاده کنید.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Polymorphism — چندریختی در عمل</h2>
+  <p>
+    <strong>Polymorphism</strong> یعنی می‌توانید با یک کد واحد، با چند نوع مختلف کار کنید — چون همه
+    آن‌ها یک قرارداد مشترک (interface یا کلاس والد مشترک) دارند. این یکی از قدرتمندترین ابزارهای OOP است.
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">polymorphism-example.ts</span></div>
+    <div class="code-body"><span class="c-comment">// همان Shape انتزاعی از بالا را ادامه می‌دهیم</span>
+
+<span class="c-comment">// این تابع نمی‌داند نوع دقیق شکل چیست — فقط می‌داند یک Shape است</span>
+<span class="c-keyword">function</span> <span class="c-fn">printTotalArea</span>(shapes: <span class="c-type">Shape</span>[]): <span class="c-type">void</span> {
+  <span class="c-keyword">let</span> total = <span class="c-num">0</span>;
+  <span class="c-keyword">for</span> (<span class="c-keyword">const</span> shape <span class="c-keyword">of</span> shapes) {
+    <span class="c-comment">// polymorphism اینجاست: calculateArea() برای هر شکل رفتار متفاوتی دارد
+    // ولی کد فراخوانی‌کننده اصلاً لازم نیست بداند کدام است</span>
+    total += shape.<span class="c-fn">calculateArea</span>();
+  }
+  console.<span class="c-fn">log</span>(<span class="c-string">`مجموع مساحت: ${total}`</span>);
+}
+
+<span class="c-keyword">const</span> shapes: <span class="c-type">Shape</span>[] = [
+  <span class="c-keyword">new</span> <span class="c-fn">Circle</span>(<span class="c-string">'قرمز'</span>, <span class="c-num">5</span>),
+  <span class="c-keyword">new</span> <span class="c-fn">Rectangle</span>(<span class="c-string">'آبی'</span>, <span class="c-num">4</span>, <span class="c-num">6</span>),
+  <span class="c-keyword">new</span> <span class="c-fn">Circle</span>(<span class="c-string">'سبز'</span>, <span class="c-num">2</span>),
+];
+
+<span class="c-fn">printTotalArea</span>(shapes); <span class="c-comment">// هر عضو آرایه calculateArea مخصوص خودش را اجرا می‌کند</span></div>
+  </div>
+
+  <div class="explain-box">
+    <p><strong>مثال دنیای واقعی در Node.js:</strong> در فصل Resilience Patterns، همه استراتژی‌های retry یک متد <code>execute()</code> مشترک داشتند. در فصل GoF Design Patterns، الگوی Strategy دقیقاً همین اصل Polymorphism بود — کد اصلی نمی‌داند کدام strategy اجرا می‌شود، فقط می‌داند یک متد مشترک صدا می‌زند.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">جمع‌بندی: چهار کلمه کلیدی کنار هم</h2>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">all-together.ts</span></div>
+    <div class="code-body"><span class="c-comment">// Interface — قرارداد</span>
+<span class="c-keyword">interface</span> <span class="c-type">PaymentMethod</span> {
+  process(amount: <span class="c-type">number</span>): <span class="c-type">boolean</span>;
+}
+
+<span class="c-comment">// Abstract Class — نیمه‌کاره، کد مشترک + بخش اجباری</span>
+<span class="c-keyword">abstract class</span> <span class="c-fn">BasePayment</span> <span class="c-keyword">implements</span> <span class="c-type">PaymentMethod</span> {
+  <span class="c-keyword">protected</span> logs: <span class="c-type">string</span>[] = [];
+
+  <span class="c-comment">// abstract — هر فرزند باید خودش بنویسد</span>
+  <span class="c-keyword">abstract</span> <span class="c-fn">process</span>(amount: <span class="c-type">number</span>): <span class="c-type">boolean</span>;
+
+  <span class="c-comment">// متد مشترک با پیاده‌سازی — همه فرزندان استفاده می‌کنند</span>
+  <span class="c-fn">log</span>(message: <span class="c-type">string</span>) {
+    <span class="c-keyword">this</span>.logs.<span class="c-fn">push</span>(message);
+  }
+}
+
+<span class="c-comment">// extends — ارث‌بری از BasePayment</span>
+<span class="c-keyword">class</span> <span class="c-fn">CreditCardPayment</span> <span class="c-keyword">extends</span> <span class="c-fn">BasePayment</span> {
+  <span class="c-fn">process</span>(amount: <span class="c-type">number</span>): <span class="c-type">boolean</span> {
+    <span class="c-keyword">this</span>.<span class="c-fn">log</span>(<span class="c-string">`پرداخت ${amount} با کارت اعتباری`</span>);
+    <span class="c-keyword">return true</span>;
+  }
+}
+
+<span class="c-keyword">class</span> <span class="c-fn">CryptoPayment</span> <span class="c-keyword">extends</span> <span class="c-fn">BasePayment</span> {
+  <span class="c-fn">process</span>(amount: <span class="c-type">number</span>): <span class="c-type">boolean</span> {
+    <span class="c-keyword">this</span>.<span class="c-fn">log</span>(<span class="c-string">`پرداخت ${amount} با رمزارز`</span>);
+    <span class="c-keyword">return true</span>;
+  }
+}
+
+<span class="c-comment">// Polymorphism — یک آرایه از انواع مختلف، همه با یک رابط مشترک</span>
+<span class="c-keyword">const</span> methods: <span class="c-type">PaymentMethod</span>[] = [<span class="c-keyword">new</span> <span class="c-fn">CreditCardPayment</span>(), <span class="c-keyword">new</span> <span class="c-fn">CryptoPayment</span>()];
+methods.<span class="c-fn">forEach</span>(m => m.<span class="c-fn">process</span>(<span class="c-num">100</span>));</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Decorators — تزیین کردن Class و Method</h2>
+  <p>
+    <strong>Decorator</strong> یک تابع خاص است که با علامت <code>@</code> روی یک class، method، property
+    یا parameter گذاشته می‌شود تا رفتار یا metadata اضافه کند — بدون اینکه کد اصلی آن قسمت را تغییر دهید.
+    این دقیقاً همان چیزی است که NestJS (فصل ۲۳ و ۶۳) در همه‌جا از آن استفاده می‌کند: <code>@Controller</code>،
+    <code>@Injectable</code>، <code>@Get</code> و غیره.
+  </p>
+
+  <div class="explain-box">
+    <p><strong>تشبیه ساده:</strong> Decorator مثل یک برچسب روی یک بسته پستی است. خود بسته (کلاس یا متد) تغییر نمی‌کند، ولی برچسب («شکستنی»، «فوری») به سیستم پستی (framework) می‌گوید با این بسته چطور رفتار کند.</p>
+  </div>
+
+  <h3 class="sub-title">فعال کردن Decorators در TypeScript</h3>
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">tsconfig.json</span></div>
+    <div class="code-body">{
+  "compilerOptions": {
+    "experimentalDecorators": <span class="c-keyword">true</span>,
+    "emitDecoratorMetadata": <span class="c-keyword">true</span>
+  }
+}</div>
+  </div>
+
+  <h3 class="sub-title">Class Decorator — تزیین کل کلاس</h3>
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">class-decorator.ts</span></div>
+    <div class="code-body"><span class="c-comment">// یک Class Decorator ساده — constructor کلاس را می‌گیرد</span>
+<span class="c-keyword">function</span> <span class="c-fn">Loggable</span>(constructor: <span class="c-type">Function</span>) {
+  console.<span class="c-fn">log</span>(<span class="c-string">`کلاس ${constructor.name} ساخته شد`</span>);
+}
+
+<span class="c-decorator">@Loggable</span>
+<span class="c-keyword">class</span> <span class="c-fn">UserService</span> {
+  <span class="c-fn">getUser</span>() { <span class="c-keyword">return</span> <span class="c-string">'Ali'</span>; }
+}
+<span class="c-comment">// خروجی موقع import شدن فایل: "کلاس UserService ساخته شد"</span>
+
+<span class="c-comment">// Decorator Factory — تابعی که یک decorator برمی‌گرداند (پارامتر می‌پذیرد)</span>
+<span class="c-keyword">function</span> <span class="c-fn">Component</span>(name: <span class="c-type">string</span>) {
+  <span class="c-keyword">return function</span>(constructor: <span class="c-type">Function</span>) {
+    constructor.prototype.componentName = name;
+  };
+}
+
+<span class="c-decorator">@Component</span>(<span class="c-string">'user-widget'</span>) <span class="c-comment">// دقیقاً همین الگو در @Controller('users') در NestJS استفاده می‌شود</span>
+<span class="c-keyword">class</span> <span class="c-fn">UserWidget</span> {}</div>
+  </div>
+
+  <h3 class="sub-title">Method Decorator — تزیین یک متد</h3>
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">method-decorator.ts</span></div>
+    <div class="code-body"><span class="c-comment">// اندازه‌گیری زمان اجرای یک متد — کاربرد واقعی و رایج</span>
+<span class="c-keyword">function</span> <span class="c-fn">MeasureTime</span>(target: <span class="c-type">any</span>, propertyKey: <span class="c-type">string</span>, descriptor: <span class="c-type">PropertyDescriptor</span>) {
+  <span class="c-keyword">const</span> originalMethod = descriptor.value; <span class="c-comment">// متد اصلی را نگه می‌داریم</span>
+
+  <span class="c-comment">// متد اصلی را با یک نسخه جدید جایگزین می‌کنیم</span>
+  descriptor.value = <span class="c-keyword">function</span>(...args: <span class="c-type">any</span>[]) {
+    <span class="c-keyword">const</span> start = Date.<span class="c-fn">now</span>();
+    <span class="c-keyword">const</span> result = originalMethod.<span class="c-fn">apply</span>(<span class="c-keyword">this</span>, args); <span class="c-comment">// متد اصلی را صدا می‌زنیم</span>
+    console.<span class="c-fn">log</span>(<span class="c-string">`${propertyKey} در ${Date.now() - start}ms اجرا شد`</span>);
+    <span class="c-keyword">return</span> result;
+  };
+}
+
+<span class="c-keyword">class</span> <span class="c-fn">ReportService</span> {
+  <span class="c-decorator">@MeasureTime</span>
+  <span class="c-fn">generateReport</span>() {
+    <span class="c-comment">// یک کار سنگین فرضی</span>
+    <span class="c-keyword">for</span> (<span class="c-keyword">let</span> i = <span class="c-num">0</span>; i < <span class="c-num">1000000</span>; i++) {}
+    <span class="c-keyword">return</span> <span class="c-string">'گزارش آماده شد'</span>;
+  }
+}
+
+<span class="c-keyword">new</span> <span class="c-fn">ReportService</span>().<span class="c-fn">generateReport</span>();
+<span class="c-comment">// خروجی: "generateReport در 3ms اجرا شد"</span></div>
+  </div>
+
+  <h3 class="sub-title">Property و Parameter Decorator</h3>
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">property-parameter-decorators.ts</span></div>
+    <div class="code-body"><span class="c-comment">// Property Decorator — روی یک property اجرا می‌شود</span>
+<span class="c-keyword">function</span> <span class="c-fn">Required</span>(target: <span class="c-type">any</span>, propertyKey: <span class="c-type">string</span>) {
+  console.<span class="c-fn">log</span>(<span class="c-string">`${propertyKey} الزامی علامت‌گذاری شد`</span>);
+  <span class="c-comment">// در پیاده‌سازی واقعی، معمولاً metadata ذخیره می‌شود
+  // که بعداً یک validator آن را می‌خواند (دقیقاً کاری که class-validator در فصل 27 و 45 می‌کند)</span>
+}
+
+<span class="c-keyword">class</span> <span class="c-fn">CreateUserDto</span> {
+  <span class="c-decorator">@Required</span>
+  name: <span class="c-type">string</span>;
+
+  <span class="c-decorator">@Required</span>
+  email: <span class="c-type">string</span>;
+}
+
+<span class="c-comment">// Parameter Decorator — روی یک پارامتر تابع اجرا می‌شود
+// دقیقاً معادل چیزی که @Param() و @Body() در NestJS پشت صحنه انجام می‌دهند (فصل 23 و 63)</span>
+<span class="c-keyword">function</span> <span class="c-fn">LogParam</span>(target: <span class="c-type">any</span>, methodName: <span class="c-type">string</span>, parameterIndex: <span class="c-type">number</span>) {
+  console.<span class="c-fn">log</span>(<span class="c-string">`پارامتر شماره ${parameterIndex} در متد ${methodName} رصد می‌شود`</span>);
+}
+
+<span class="c-keyword">class</span> <span class="c-fn">OrderController</span> {
+  <span class="c-fn">createOrder</span>(<span class="c-decorator">@LogParam</span> userId: <span class="c-type">string</span>) { <span class="c-comment">/* ... */</span> }
+}</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">چرا NestJS این‌قدر روی Decorator تکیه دارد؟</h2>
+  <p>
+    اکنون که مکانیزم Decorator را دیدید، الگوهایی که در فصل ۲۳ و ۶۳ استفاده کردیم منطقی‌تر می‌شوند:
+  </p>
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">nestjs-decorators-explained.ts</span></div>
+    <div class="code-body"><span class="c-decorator">@Controller</span>(<span class="c-string">'users'</span>)     <span class="c-comment">// Class Decorator با factory — مشخص می‌کند این کلاس یک HTTP controller است</span>
+<span class="c-keyword">export class</span> <span class="c-fn">UsersController</span> {
+
+  <span class="c-decorator">@Get</span>(<span class="c-string">':id'</span>)          <span class="c-comment">// Method Decorator — این متد به GET /users/:id پاسخ می‌دهد</span>
+  <span class="c-fn">getUser</span>(
+    <span class="c-decorator">@Param</span>(<span class="c-string">'id'</span>) id: <span class="c-type">string</span> <span class="c-comment">// Parameter Decorator — این پارامتر از URL params می‌آید</span>
+  ) {
+    <span class="c-keyword">return this</span>.usersService.<span class="c-fn">findOne</span>(id);
+  }
+}
+
+<span class="c-comment">// پشت صحنه، NestJS دقیقاً همان مکانیزمی که بالا دیدیم را استفاده می‌کند:
+// این metadata‌ها را می‌خواند و بر اساس آن‌ها route، injection، و validation را می‌سازد</span></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">نکات کلیدی برای مصاحبه</h2>
+  <ul class="key-points">
+    <li><strong>extends</strong>: ارث بردن کد واقعی از یک کلاس — فقط از یک کلاس ممکن است (single inheritance).</li>
+    <li><strong>implements</strong>: تعهد به یک قرارداد شکل (interface) — می‌توانید چند interface را همزمان implement کنید.</li>
+    <li><strong>public/private/protected/readonly</strong>: چهار سطح دسترسی TypeScript — public همه‌جا، private فقط داخل همان کلاس، protected داخل کلاس و فرزندانش، readonly فقط یک‌بار قابل مقداردهی.</li>
+    <li>میان‌بر <strong>constructor shorthand</strong> (مثل <code>constructor(private name: string)</code>) هم property می‌سازد هم مقداردهی می‌کند — همان الگویی که در تزریق dependency در NestJS همه‌جا دیدیم.</li>
+    <li><strong>interface</strong> هیچ کد اجرایی ندارد، فقط شکل را تعریف می‌کند؛ در runtime هم اصلاً وجود ندارد (فقط زمان کامپایل چک می‌شود).</li>
+    <li><strong>abstract class</strong> ترکیبی از interface و کلاس معمولی است — می‌تواند هم متد پیاده‌سازی‌شده هم متد اجباری (abstract) داشته باشد؛ نمی‌توان مستقیم از آن instance ساخت.</li>
+    <li><strong>Polymorphism</strong> یعنی یک قطعه کد می‌تواند با چند نوع مختلف کار کند، چون همه یک قرارداد مشترک دارند — پایه الگوی Strategy در فصل GoF.</li>
+    <li>سوال رایج: «چرا نمی‌توان از abstract class مستقیم instance ساخت؟» — چون ممکن است متد abstract بدون پیاده‌سازی داشته باشد؛ اگر instance مستقیم مجاز بود، صدا زدن آن متد خطای runtime می‌داد؛ TypeScript این را از قبل، در کامپایل، جلوگیری می‌کند.</li>
+    <li>سوال رایج: «فرق private در TypeScript و #field در جاوااسکریپت چیست؟» — private فقط زمان کامپایل چک می‌شود و بعد از تبدیل به JS خام از بین می‌رود (با ترفند قابل دور زدن است)؛ #field یک ویژگی واقعی زبان جاوااسکریپت است که حتی در runtime هم واقعاً غیرقابل دسترسی از بیرون است.</li>
+    <li>یک تله رایج: قاطی کردن interface و type در TypeScript — هر دو برای تعریف شکل استفاده می‌شوند، ولی interface قابل extend/merge شدن است و برای کلاس‌ها با implements طبیعی‌تر است؛ type برای union و ترکیب‌های پیچیده‌تر بهتر است (یادآوری فصل ۱۲).</li>
+    <li>یک تله رایج دیگر: فراموش کردن اینکه <strong>protected</strong> از «بیرون» کلاس (حتی توسط یک instance از همان کلاس در یک متد دیگر) قابل دسترسی نیست — فقط از داخل خود کلاس یا کلاس‌های فرزند در زمینه this قابل استفاده است.</li>
+    <li><strong>Decorator</strong> تابعی است که metadata یا رفتار اضافه به class/method/property/parameter می‌دهد، بدون تغییر کد اصلی آن — پایه معماری NestJS.</li>
+    <li>چهار نوع Decorator: <strong>Class</strong> (روی کل کلاس)، <strong>Method</strong> (روی یک متد، با دسترسی به descriptor)، <strong>Property</strong> (روی یک ویژگی)، <strong>Parameter</strong> (روی یک پارامتر تابع).</li>
+    <li>سوال رایج: «چطور @Controller در NestJS کار می‌کند؟» — یک Class Decorator (در واقع Decorator Factory چون آرگومان می‌گیرد) است که metadata (مثل مسیر پایه route) را روی کلاس ذخیره می‌کند؛ NestJS در زمان راه‌اندازی این metadata را می‌خواند و route‌ها را می‌سازد.</li>
+  </ul>
+
+  <div class="chapter-nav">
+    <a class="nav-btn" href="nodejs-course-chapter63.html">← فصل قبلی: NestJS پیشرفته</a>
+    <span class="nav-btn next disabled">پایان دوره ✓</span>
+  </div>
+</main>
+<script>
+function toggleMobileMenu(){
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('open');
+}
+document.querySelectorAll('.sidebar .nav-item').forEach(function(link){
+  link.addEventListener('click', function(){
+    document.querySelector('.sidebar').classList.remove('open');
+    document.getElementById('mobileOverlay').classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>

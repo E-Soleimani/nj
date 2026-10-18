@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>دوره Node.js — فصل 63</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--border:#2a3347;--accent:#4ade80;--accent2:#22d3ee;--accent3:#a78bfa;--text:#e2e8f0;--text-muted:#8b9ab5;--text-dim:#4a5568;--code-bg:#0d1117}
+body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;display:flex;min-height:100vh;overflow-x:hidden}
+.sidebar{width:280px;min-width:280px;background:var(--bg2);border-left:1px solid var(--border);padding:2rem 0;position:fixed;right:0;top:0;height:100vh;overflow-y:auto;z-index:100}
+.sidebar-logo{padding:0 1.5rem 1.5rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+.sidebar-logo .logo-icon{width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem}
+.sidebar-logo h2{font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px}
+.sidebar-logo p{font-size:12px;color:var(--text-muted)}
+.nav-section-title{font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;padding:0 1.5rem;margin:1.25rem 0 0.5rem}
+.nav-item{display:flex;align-items:center;gap:0.6rem;padding:0.5rem 1.5rem;font-size:12.5px;color:var(--text-muted);cursor:pointer;border-right:3px solid transparent;transition:all 0.15s;text-decoration:none}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(74,222,128,0.08);color:var(--accent);border-right-color:var(--accent);font-weight:500}
+.nav-item .num{font-size:10px;background:var(--bg3);border-radius:4px;padding:1px 5px;min-width:22px;text-align:center;font-family:'Fira Code',monospace}
+.nav-item.active .num{background:rgba(74,222,128,0.15);color:var(--accent)}
+.main{margin-right:280px;flex:1;padding:3rem 3.5rem 5rem;max-width:860px}
+.chapter-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);border-radius:20px;padding:4px 14px;font-size:12px;color:var(--accent);margin-bottom:1rem;font-weight:500}
+h1.chapter-title{font-size:2.2rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:0.75rem}
+h1.chapter-title span{color:var(--accent)}
+.chapter-desc{font-size:16px;color:var(--text-muted);margin-bottom:2.5rem;max-width:600px}
+.divider{height:1px;background:var(--border);margin:2.5rem 0}
+h2.section-title{font-size:1.25rem;font-weight:700;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;gap:10px}
+h2.section-title::before{content:'';display:block;width:4px;height:22px;background:var(--accent);border-radius:2px}
+h3.sub-title{font-size:1rem;font-weight:700;color:var(--accent2);margin:1.5rem 0 0.6rem}
+p{color:var(--text-muted);font-size:15px;margin-bottom:1rem}
+strong{color:var(--text);font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:1rem 0}
+.tag{font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;font-family:'Fira Code',monospace}
+.tag.green{background:rgba(22,101,52,0.4);color:#86efac;border:1px solid rgba(134,239,172,0.2)}
+.tag.blue{background:rgba(30,58,95,0.6);color:#7dd3fc;border:1px solid rgba(125,211,252,0.2)}
+.tag.purple{background:rgba(59,31,110,0.6);color:#c4b5fd;border:1px solid rgba(196,181,253,0.2)}
+.tag.orange{background:rgba(180,83,9,0.4);color:#fdba74;border:1px solid rgba(253,186,116,0.2)}
+.code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:12px;margin:1.25rem 0;overflow:hidden;direction:ltr}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 1rem;background:var(--bg3);border-bottom:1px solid var(--border);direction:ltr}
+.code-header .dots{display:flex;gap:6px}
+.code-header .dot{width:10px;height:10px;border-radius:50%}
+.code-header .dot.red{background:#ff5f56}.code-header .dot.yellow{background:#ffbd2e}.code-header .dot.green{background:#27c93f}
+.code-header .filename{font-size:12px;color:var(--text-muted);font-family:'Fira Code',monospace}
+.code-body{padding:1.25rem 1.5rem;font-family:'Fira Code',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;white-space:pre;color:#e2e8f0;text-align:left;direction:ltr}
+.c-comment{color:#6b7e99}.c-keyword{color:#c084fc}.c-string{color:#86efac}.c-fn{color:#67e8f9}.c-num{color:#fb923c}.c-op{color:#94a3b8}.c-type{color:#fbbf24}.c-decorator{color:#fb923c}.c-cmd{color:#fbbf24}
+.note-box{background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.25);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0;display:flex;gap:0.75rem}
+.note-box p{color:var(--text-muted);font-size:14px;margin:0}
+.note-box strong{color:var(--accent2)}
+.warn-box{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0;display:flex;gap:0.75rem}
+.warn-box p{color:var(--text-muted);font-size:14px;margin:0}
+.warn-box strong{color:#fbbf24}
+.explain-box{background:var(--bg2);border-right:3px solid var(--accent3);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin:1rem 0}
+.explain-box p{font-size:14px;color:var(--text-muted);margin:0}
+.explain-box strong{color:var(--accent3)}
+.key-points{list-style:none;margin:1rem 0}
+.key-points li{display:flex;gap:0.75rem;align-items:flex-start;margin-bottom:0.75rem;font-size:14px;color:var(--text-muted)}
+.key-points li::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0;margin-top:2px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
+.cg-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem}
+.cg-card h4{font-size:14px;font-weight:700;margin-bottom:8px}
+.cg-card p{font-size:13px;color:var(--text-muted);margin:0 0 4px}
+.chapter-nav{display:flex;justify-content:space-between;margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border)}
+.nav-btn{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:14px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;font-family:'Vazirmatn',sans-serif}
+.nav-btn:hover{border-color:var(--accent);color:var(--accent)}
+.nav-btn.next{background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.3);color:var(--accent)}
+
+
+
+
+  /* --- Fix: راست‌چین کردن کامنت‌های فارسی داخل بلوک کد --- */
+  .c-comment{unicode-bidi:isolate;direction:rtl}
+
+  /* --- Fix: ریسپانسیو کامل --- */
+  @media(max-width:1024px){
+    .main{margin-right:240px;padding:2rem}
+    .sidebar{width:240px;min-width:240px}
+  }
+  @media(max-width:900px){
+    body{display:block}
+    .main{margin-right:0;padding:1.25rem;max-width:100%}
+    h1.chapter-title{font-size:1.6rem}
+    .chapter-desc{font-size:14px}
+    /* Safety net: هر گرید یا فلکس چندستونه در موبایل تک‌ستونی و ایمن شود */
+    .compare-grid,.cg-card,.use-cases,.pattern-grid,.arch-grid,
+    .branch-grid,.cmd-grid,.range-grid,.module-compare,.pillar-grid,
+    .test-types,.ts-benefits,.compare-row,.error-types{grid-template-columns:1fr!important}
+    .semver-box,.di-diagram,.git-states,.tdd-cycle,.ws-clients,.flow-row{flex-wrap:wrap!important}
+    .git-state,.tdd-step{flex:1 1 100%!important;min-width:0!important}
+    .code-body{font-size:12px;padding:1rem}
+    .chapter-nav{flex-direction:column;gap:10px}
+    .nav-btn{width:100%;justify-content:center;text-align:center}
+    .tags{gap:6px}
+    .tag{font-size:11px;padding:3px 10px}
+  }
+  @media(max-width:480px){
+    .main{padding:1rem}
+    h1.chapter-title{font-size:1.35rem}
+    .code-body{font-size:11px;padding:0.75rem}
+    .code-header .filename{font-size:10px}
+    .chapter-badge{font-size:11px;padding:3px 10px}
+  }
+  /* دکمه‌های قبلی/بعدی حالا لینک هستند نه button - استایل یکسان بماند */
+  a.nav-btn{text-decoration:none}
+  a.nav-btn.disabled{opacity:0.4;pointer-events:none;cursor:default}
+
+  /* --- Fix: دکمه همبرگری و منوی موبایل --- */
+  .mobile-menu-btn{
+    display:none;
+    position:fixed;
+    top:16px;
+    right:16px;
+    z-index:200;
+    width:44px;
+    height:44px;
+    background:var(--bg2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+  }
+  .mobile-menu-btn svg{width:22px;height:22px;stroke:var(--accent)}
+  .mobile-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    z-index:150;
+  }
+  .mobile-overlay.open{display:block}
+
+  @media(max-width:900px){
+    .mobile-menu-btn{display:flex}
+    .sidebar{
+      display:flex!important;
+      flex-direction:column;
+      transform:translateX(100%);
+      transition:transform 0.25s ease;
+      z-index:180;
+      box-shadow:-4px 0 20px rgba(0,0,0,0.4);
+    }
+    .sidebar.open{transform:translateX(0)}
+    .main{padding-top:4.5rem}
+  }
+
+</style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="باز کردن منو">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+</button>
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0f1117" stroke-width="2.5" stroke-linecap="round" width="22" height="22"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+    <h2>دوره Node.js</h2><p>۶۳ فصل — مقدماتی تا پیشرفته</p>
+  </div>
+  <div class="nav-section-title">بخش مقدماتی</div>
+  <a class="nav-item" href="nodejs-course-chapter1.html"><span class="num">01</span> معماری و تاریخچه</a>
+  <a class="nav-item" href="nodejs-course-chapter2.html"><span class="num">02</span> توسعه روی Linux</a>
+  <a class="nav-item" href="nodejs-course-chapter3.html"><span class="num">03</span> NPM و ماژول‌ها</a>
+  <a class="nav-item" href="nodejs-course-chapter4.html"><span class="num">04</span> Semantic Versioning</a>
+  <a class="nav-item" href="nodejs-course-chapter5.html"><span class="num">05</span> Git Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter6.html"><span class="num">06</span> Git Flow</a>
+  <a class="nav-item" href="nodejs-course-chapter7.html"><span class="num">07</span> Github</a>
+  <a class="nav-item" href="nodejs-course-chapter8.html"><span class="num">08</span> Testing & TDD</a>
+  <a class="nav-item" href="nodejs-course-chapter9.html"><span class="num">09</span> JS Fundamentals</a>
+  <a class="nav-item" href="nodejs-course-chapter10.html"><span class="num">10</span> OOP</a>
+  <a class="nav-item" href="nodejs-course-chapter11.html"><span class="num">11</span> Advanced JS</a>
+  <a class="nav-item" href="nodejs-course-chapter12.html"><span class="num">12</span> TypeScript</a>
+  <a class="nav-item" href="nodejs-course-chapter13.html"><span class="num">13</span> Error Handling</a>
+  <a class="nav-item" href="nodejs-course-chapter14.html"><span class="num">14</span> Async Programming</a>
+  <a class="nav-item" href="nodejs-course-chapter15.html"><span class="num">15</span> Non-Blocking & Concurrency</a>
+  <a class="nav-item" href="nodejs-course-chapter16.html"><span class="num">16</span> Async Flow Control</a>
+  <a class="nav-item" href="nodejs-course-chapter17.html"><span class="num">17</span> Web Server (Fastify)</a>
+  <a class="nav-item" href="nodejs-course-chapter18.html"><span class="num">18</span> Chat Server</a>
+  <a class="nav-item" href="nodejs-course-chapter19.html"><span class="num">19</span> Docker</a>
+  <a class="nav-item" href="nodejs-course-chapter20.html"><span class="num">20</span> MongoDB</a>
+  <a class="nav-item" href="nodejs-course-chapter21.html"><span class="num">21</span> Redis Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter22.html"><span class="num">22</span> Frameworks & IOC</a>
+  <a class="nav-item" href="nodejs-course-chapter23.html"><span class="num">23</span> NestJS</a>
+  <div class="nav-section-title">بخش پیشرفته</div>
+  <a class="nav-item" href="nodejs-course-chapter24.html"><span class="num">24</span> Currying & Composition</a>
+  <a class="nav-item" href="nodejs-course-chapter25.html"><span class="num">25</span> Isomorphic & Idempotent</a>
+  <a class="nav-item" href="nodejs-course-chapter26.html"><span class="num">26</span> Functional Data Modeling</a>
+  <a class="nav-item" href="nodejs-course-chapter27.html"><span class="num">27</span> Zod</a>
+  <a class="nav-item" href="nodejs-course-chapter28.html"><span class="num">28</span> SOLID</a>
+  <a class="nav-item" href="nodejs-course-chapter29.html"><span class="num">29</span> GoF Design Patterns</a>
+  <a class="nav-item" href="nodejs-course-chapter30.html"><span class="num">30</span> Refactoring</a>
+  <a class="nav-item" href="nodejs-course-chapter31.html"><span class="num">31</span> Event Emitter</a>
+  <a class="nav-item" href="nodejs-course-chapter32.html"><span class="num">32</span> Pub/Sub (Cluster)</a>
+  <a class="nav-item" href="nodejs-course-chapter33.html"><span class="num">33</span> Queues & Brokers</a>
+  <a class="nav-item" href="nodejs-course-chapter34.html"><span class="num">34</span> Working with Streams</a>
+  <a class="nav-item" href="nodejs-course-chapter35.html"><span class="num">35</span> Custom Streams & Generators</a>
+  <a class="nav-item" href="nodejs-course-chapter36.html"><span class="num">36</span> RxJS</a>
+  <a class="nav-item" href="nodejs-course-chapter37.html"><span class="num">37</span> 12 Factor App</a>
+  <a class="nav-item" href="nodejs-course-chapter38.html"><span class="num">38</span> Resilience Patterns</a>
+  <a class="nav-item" href="nodejs-course-chapter39.html"><span class="num">39</span> Postgres Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter40.html"><span class="num">40</span> TypeORM</a>
+  <a class="nav-item" href="nodejs-course-chapter41.html"><span class="num">41</span> TS: Thinking in Types</a>
+  <a class="nav-item" href="nodejs-course-chapter42.html"><span class="num">42</span> Web Frameworks Compare</a>
+  <a class="nav-item" href="nodejs-course-chapter43.html"><span class="num">43</span> Onion & Clean Architecture</a>
+  <a class="nav-item" href="nodejs-course-chapter44.html"><span class="num">44</span> Microservices Patterns</a>
+  <div class="nav-section-title">بخش تکمیلی</div>
+  <a class="nav-item" href="nodejs-course-chapter45.html"><span class="num">45</span> Authentication (JWT)</a>
+  <a class="nav-item" href="nodejs-course-chapter46.html"><span class="num">46</span> Authorization & RBAC</a>
+  <a class="nav-item" href="nodejs-course-chapter47.html"><span class="num">47</span> Security Essentials</a>
+  <a class="nav-item" href="nodejs-course-chapter48.html"><span class="num">48</span> Caching Strategies</a>
+  <a class="nav-item" href="nodejs-course-chapter49.html"><span class="num">49</span> API Design</a>
+  <a class="nav-item" href="nodejs-course-chapter50.html"><span class="num">50</span> Monitoring & Observability</a>
+  <a class="nav-item" href="nodejs-course-chapter51.html"><span class="num">51</span> Advanced Testing</a>
+  <a class="nav-item" href="nodejs-course-chapter52.html"><span class="num">52</span> Node.js Internals & Memory</a>
+  <a class="nav-item" href="nodejs-course-chapter53.html"><span class="num">53</span> Serverless (AWS Lambda)</a>
+  <a class="nav-item" href="nodejs-course-chapter54.html"><span class="num">54</span> CI/CD Pipeline کامل</a>
+  <div class="nav-section-title">بخش عملی نهایی</div>
+  <a class="nav-item" href="nodejs-course-chapter55.html"><span class="num">55</span> PM2 & Process Management</a>
+  <a class="nav-item" href="nodejs-course-chapter56.html"><span class="num">56</span> File Upload & Streaming</a>
+  <a class="nav-item" href="nodejs-course-chapter57.html"><span class="num">57</span> Webhooks</a>
+  <a class="nav-item" href="nodejs-course-chapter58.html"><span class="num">58</span> Cron & Scheduled Tasks</a>
+  <a class="nav-item" href="nodejs-course-chapter59.html"><span class="num">59</span> npm Monorepo & Workspaces</a>
+  <a class="nav-item" href="nodejs-course-chapter60.html"><span class="num">60</span> Config Validation & Feature Flags</a>
+  <a class="nav-item" href="nodejs-course-chapter61.html"><span class="num">61</span> gRPC</a>
+  <div class="nav-section-title">تمرکز ویژه مصاحبه</div>
+  <a class="nav-item" href="nodejs-course-chapter62.html"><span class="num">62</span> Express.js عمیق</a>
+  <a class="nav-item active" href="nodejs-course-chapter63.html"><span class="num">63</span> NestJS پیشرفته</a>
+  <a class="nav-item" href="nodejs-course-chapter64.html"><span class="num">64</span> OOP کامل و Decorators</a>
+</aside>
+<main class="main">
+  <div class="chapter-badge"><span>●</span> فصل شصت و سوم — تمرکز مصاحبه</div>
+  <h1 class="chapter-title">NestJS<br/><span>پیشرفته و کامل</span></h1>
+  <p class="chapter-desc">فراتر از پایه — Pipes، Interceptors، Exception Filters، Custom Decorators، تست‌نویسی حرفه‌ای، و ماژول Microservices که استاد گفته تمرکز ویژه مصاحبه است.</p>
+  <div class="tags"><span class="tag green">Pipes</span><span class="tag blue">Interceptors</span><span class="tag purple">Exception Filters</span><span class="tag green">Custom Decorators</span><span class="tag blue">Testing</span></div>
+  <div class="divider"></div>
+
+  <h2 class="section-title">فراتر از پایه NestJS</h2>
+  <p>
+    در فصل ۲۳ با ساختار پایه NestJS (Module، Controller، Service، DTO، Guard) آشنا شدیم.
+    استاد گفته این framework تمرکز ویژه مصاحبه است، پس در این فصل عمیق‌تر می‌رویم:
+    <strong>Pipes</strong>، <strong>Interceptors</strong>، <strong>Exception Filters</strong>،
+    <strong>Custom Decorators</strong>، تست‌نویسی، و ماژول Microservices.
+  </p>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">چرخه کامل درخواست در NestJS</h2>
+  <p>هر درخواست HTTP قبل از رسیدن به Controller، از چند لایه عبور می‌کند — ترتیب دقیق آن‌ها مهم است:</p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">request-lifecycle.txt</span></div>
+    <div class="code-body">Request
+  → Middleware              (مثل Express — قبل از هر چیز)
+  → Guard                   (تصمیم: اجازه ورود دارد یا نه)
+  → Interceptor (قبل)       (کد قبل از handler)
+  → Pipe                    (validation و transform ورودی)
+  → Route Handler           (منطق اصلی — Controller method)
+  → Interceptor (بعد)       (کد بعد از handler، روی response)
+  → Exception Filter        (فقط اگر خطا رخ داده باشد)
+Response</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Pipes — Validation و Transformation</h2>
+  <p>
+    <strong>Pipe</strong> دو کار انجام می‌دهد: داده ورودی را <strong>validate</strong> می‌کند یا
+    <strong>transform</strong> (تبدیل نوع) می‌کند — قبل از رسیدن به handler.
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">Pipe های داخلی NestJS</span></div>
+    <div class="code-body"><span class="c-keyword">import</span> { ParseIntPipe, ParseBoolPipe, ParseUUIDPipe, DefaultValuePipe } <span class="c-keyword">from</span> <span class="c-string">'@nestjs/common'</span>;
+
+<span class="c-decorator">@Controller</span>(<span class="c-string">'products'</span>)
+<span class="c-keyword">export class</span> <span class="c-fn">ProductsController</span> {
+
+  <span class="c-comment">// ParseIntPipe — تبدیل رشته URL به عدد؛ اگر عدد نباشد خودکار 400 می‌دهد</span>
+  <span class="c-decorator">@Get</span>(<span class="c-string">':id'</span>)
+  <span class="c-fn">findOne</span>(<span class="c-decorator">@Param</span>(<span class="c-string">'id'</span>, ParseIntPipe) id: <span class="c-type">number</span>) {
+    <span class="c-comment">// اینجا id واقعاً از نوع number است، نه string</span>
+    <span class="c-keyword">return this</span>.productsService.<span class="c-fn">findOne</span>(id);
+  }
+
+  <span class="c-comment">// ترکیب چند Pipe و مقدار پیش‌فرض برای query</span>
+  <span class="c-decorator">@Get</span>()
+  <span class="c-fn">findAll</span>(
+    <span class="c-decorator">@Query</span>(<span class="c-string">'page'</span>, <span class="c-keyword">new</span> DefaultValuePipe(<span class="c-num">1</span>), ParseIntPipe) page: <span class="c-type">number</span>,
+    <span class="c-decorator">@Query</span>(<span class="c-string">'inStock'</span>, <span class="c-keyword">new</span> DefaultValuePipe(<span class="c-keyword">true</span>), ParseBoolPipe) inStock: <span class="c-type">boolean</span>
+  ) {
+    <span class="c-keyword">return this</span>.productsService.<span class="c-fn">findAll</span>({ page, inStock });
+  }
+}</div>
+  </div>
+
+  <h3 class="sub-title">ساخت یک Custom Pipe</h3>
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">pipes/positive-int.pipe.ts</span></div>
+    <div class="code-body"><span class="c-keyword">import</span> { PipeTransform, Injectable, BadRequestException } <span class="c-keyword">from</span> <span class="c-string">'@nestjs/common'</span>;
+
+<span class="c-comment">// هر Pipe باید متد transform را implement کند</span>
+<span class="c-decorator">@Injectable</span>()
+<span class="c-keyword">export class</span> <span class="c-fn">PositiveIntPipe</span> <span class="c-keyword">implements</span> <span class="c-type">PipeTransform</span> {
+  <span class="c-fn">transform</span>(value: <span class="c-type">any</span>) {
+    <span class="c-keyword">const</span> num = <span class="c-fn">parseInt</span>(value, <span class="c-num">10</span>);
+    <span class="c-keyword">if</span> (isNaN(num) || num <= <span class="c-num">0</span>) {
+      <span class="c-keyword">throw new</span> <span class="c-fn">BadRequestException</span>(<span class="c-string">'باید عدد مثبت باشد'</span>);
+    }
+    <span class="c-keyword">return</span> num;
+  }
+}
+
+<span class="c-comment">// استفاده — دقیقاً مثل Pipe های built-in</span>
+<span class="c-decorator">@Get</span>(<span class="c-string">':quantity'</span>)
+<span class="c-fn">checkStock</span>(<span class="c-decorator">@Param</span>(<span class="c-string">'quantity'</span>, PositiveIntPipe) quantity: <span class="c-type">number</span>) {
+  <span class="c-comment">// ...</span>
+}</div>
+  </div>
+
+  <div class="explain-box">
+    <p><strong>ValidationPipe global:</strong> در فصل ۲۳ با DTO و class-validator آشنا شدیم. برای اینکه این validation خودکار روی همه route ها اجرا شود، معمولاً یک <code>ValidationPipe</code> سراسری در main.ts ثبت می‌شود: <code>app.useGlobalPipes(new ValidationPipe())</code>.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Interceptors — دور زدن اجرای متد</h2>
+  <p>
+    <strong>Interceptor</strong> می‌تواند کد را <strong>قبل و بعد</strong> از اجرای handler اجرا کند —
+    برای logging، تبدیل response، caching، یا اندازه‌گیری زمان اجرا عالی است. بر پایه RxJS Observable ساخته شده (یادآوری فصل ۳۶).
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">interceptors/logging.interceptor.ts</span></div>
+    <div class="code-body"><span class="c-keyword">import</span> { Injectable, NestInterceptor, ExecutionContext, CallHandler } <span class="c-keyword">from</span> <span class="c-string">'@nestjs/common'</span>;
+<span class="c-keyword">import</span> { Observable } <span class="c-keyword">from</span> <span class="c-string">'rxjs'</span>;
+<span class="c-keyword">import</span> { tap } <span class="c-keyword">from</span> <span class="c-string">'rxjs/operators'</span>;
+
+<span class="c-decorator">@Injectable</span>()
+<span class="c-keyword">export class</span> <span class="c-fn">LoggingInterceptor</span> <span class="c-keyword">implements</span> <span class="c-type">NestInterceptor</span> {
+  <span class="c-fn">intercept</span>(context: <span class="c-type">ExecutionContext</span>, next: <span class="c-type">CallHandler</span>): <span class="c-type">Observable</span>&lt;<span class="c-type">any</span>&gt; {
+    <span class="c-keyword">const</span> request = context.<span class="c-fn">switchToHttp</span>().<span class="c-fn">getRequest</span>();
+    <span class="c-keyword">const</span> start = Date.<span class="c-fn">now</span>();
+
+    console.<span class="c-fn">log</span>(<span class="c-string">`→ ${request.method} ${request.url}`</span>); <span class="c-comment">// قبل از handler</span>
+
+    <span class="c-comment">// next.handle() اجرای واقعی route handler است</span>
+    <span class="c-keyword">return</span> next.<span class="c-fn">handle</span>().<span class="c-fn">pipe</span>(
+      tap(() => {
+        <span class="c-comment">// این بعد از اتمام handler اجرا می‌شود</span>
+        console.<span class="c-fn">log</span>(<span class="c-string">`← ${request.method} ${request.url} — ${Date.now() - start}ms`</span>);
+      })
+    );
+  }
+}
+
+<span class="c-comment">// استفاده روی یک Controller خاص</span>
+<span class="c-decorator">@UseInterceptors</span>(LoggingInterceptor)
+<span class="c-decorator">@Controller</span>(<span class="c-string">'orders'</span>)
+<span class="c-keyword">export class</span> <span class="c-fn">OrdersController</span> { <span class="c-comment">/* ... */</span> }</div>
+  </div>
+
+  <h3 class="sub-title">Interceptor برای تبدیل Response</h3>
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">interceptors/transform.interceptor.ts</span></div>
+    <div class="code-body"><span class="c-keyword">import</span> { map } <span class="c-keyword">from</span> <span class="c-string">'rxjs/operators'</span>;
+
+<span class="c-comment">// یک shape استاندارد برای همه response ها (یادآوری فصل 49)</span>
+<span class="c-decorator">@Injectable</span>()
+<span class="c-keyword">export class</span> <span class="c-fn">TransformInterceptor</span> <span class="c-keyword">implements</span> <span class="c-type">NestInterceptor</span> {
+  <span class="c-fn">intercept</span>(context: <span class="c-type">ExecutionContext</span>, next: <span class="c-type">CallHandler</span>) {
+    <span class="c-keyword">return</span> next.<span class="c-fn">handle</span>().<span class="c-fn">pipe</span>(
+      map(data => ({
+        success: <span class="c-keyword">true</span>,
+        data,
+        timestamp: <span class="c-keyword">new</span> <span class="c-fn">Date</span>().<span class="c-fn">toISOString</span>()
+      }))
+    );
+    <span class="c-comment">// هر چیزی که Controller برگرداند، خودکار در این shape می‌پیچد
+    // Controller فقط return user; می‌نویسد، این Interceptor بقیه را اضافه می‌کند</span>
+  }
+}</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Exception Filters — مدیریت متمرکز خطا</h2>
+  <p>
+    در فصل ۲۳ دیدیم که <code>NotFoundException</code> خودکار به HTTP status تبدیل می‌شود.
+    <strong>Exception Filter</strong> به شما اجازه می‌دهد این رفتار را سفارشی کنید — مثلاً فرمت خطا را تغییر دهید یا لاگ اضافه کنید.
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">filters/http-exception.filter.ts</span></div>
+    <div class="code-body"><span class="c-keyword">import</span> { ExceptionFilter, Catch, ArgumentsHost, HttpException } <span class="c-keyword">from</span> <span class="c-string">'@nestjs/common'</span>;
+
+<span class="c-comment">// @Catch(HttpException) — فقط خطاهایی که HttpException هستند را می‌گیرد</span>
+<span class="c-decorator">@Catch</span>(HttpException)
+<span class="c-keyword">export class</span> <span class="c-fn">HttpExceptionFilter</span> <span class="c-keyword">implements</span> <span class="c-type">ExceptionFilter</span> {
+  <span class="c-fn">catch</span>(exception: <span class="c-type">HttpException</span>, host: <span class="c-type">ArgumentsHost</span>) {
+    <span class="c-keyword">const</span> ctx      = host.<span class="c-fn">switchToHttp</span>();
+    <span class="c-keyword">const</span> response = ctx.<span class="c-fn">getResponse</span>();
+    <span class="c-keyword">const</span> request  = ctx.<span class="c-fn">getRequest</span>();
+    <span class="c-keyword">const</span> status   = exception.<span class="c-fn">getStatus</span>();
+
+    <span class="c-comment">// فرمت خطای یکسان برای کل اپلیکیشن</span>
+    response.<span class="c-fn">status</span>(status).<span class="c-fn">json</span>({
+      success: <span class="c-keyword">false</span>,
+      statusCode: status,
+      path: request.url,
+      message: exception.<span class="c-fn">getResponse</span>(),
+      timestamp: <span class="c-keyword">new</span> <span class="c-fn">Date</span>().<span class="c-fn">toISOString</span>()
+    });
+  }
+}
+
+<span class="c-comment">// ثبت سراسری در main.ts</span>
+<span class="c-comment">// app.useGlobalFilters(new HttpExceptionFilter());</span>
+
+<span class="c-comment">// یا @Catch() بدون آرگومان برای گرفتن همه نوع خطا (حتی خطاهای غیرمنتظره)</span>
+<span class="c-decorator">@Catch</span>()
+<span class="c-keyword">export class</span> <span class="c-fn">AllExceptionsFilter</span> <span class="c-keyword">implements</span> <span class="c-type">ExceptionFilter</span> {
+  <span class="c-fn">catch</span>(exception: <span class="c-type">unknown</span>, host: <span class="c-type">ArgumentsHost</span>) {
+    <span class="c-keyword">const</span> status = exception <span class="c-keyword">instanceof</span> HttpException
+      ? exception.<span class="c-fn">getStatus</span>()
+      : <span class="c-num">500</span>; <span class="c-comment">// خطای ناشناخته = 500</span>
+    <span class="c-comment">// ...</span>
+  }
+}</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Custom Decorators — ساخت decorator اختصاصی</h2>
+  <p>
+    گاهی می‌خواهید کدی که در چند جا تکرار می‌شود را در یک decorator ساده جمع کنید —
+    مثلاً گرفتن کاربر لاگین‌شده از request:
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">decorators/current-user.decorator.ts</span></div>
+    <div class="code-body"><span class="c-keyword">import</span> { createParamDecorator, ExecutionContext } <span class="c-keyword">from</span> <span class="c-string">'@nestjs/common'</span>;
+
+<span class="c-comment">// این decorator کاربر لاگین‌شده را از req.user (که Guard گذاشته) استخراج می‌کند</span>
+<span class="c-keyword">export const</span> CurrentUser = <span class="c-fn">createParamDecorator</span>(
+  (data: <span class="c-type">unknown</span>, ctx: <span class="c-type">ExecutionContext</span>) => {
+    <span class="c-keyword">const</span> request = ctx.<span class="c-fn">switchToHttp</span>().<span class="c-fn">getRequest</span>();
+    <span class="c-keyword">return</span> request.user;
+  }
+);
+
+<span class="c-comment">// ❌ بدون custom decorator — تکراری در هر Controller</span>
+<span class="c-decorator">@Get</span>(<span class="c-string">'profile'</span>)
+<span class="c-fn">getProfile</span>(<span class="c-decorator">@Request</span>() req) {
+  <span class="c-keyword">return</span> req.user;
+}
+
+<span class="c-comment">// ✅ با custom decorator — تمیز و خوانا</span>
+<span class="c-decorator">@Get</span>(<span class="c-string">'profile'</span>)
+<span class="c-fn">getProfile</span>(<span class="c-decorator">@CurrentUser</span>() user: <span class="c-type">User</span>) {
+  <span class="c-keyword">return</span> user;
+}
+
+<span class="c-comment">// می‌تواند یک property خاص هم بگیرد</span>
+<span class="c-keyword">export const</span> CurrentUser = <span class="c-fn">createParamDecorator</span>(
+  (data: <span class="c-type">string</span>, ctx: <span class="c-type">ExecutionContext</span>) => {
+    <span class="c-keyword">const</span> user = ctx.<span class="c-fn">switchToHttp</span>().<span class="c-fn">getRequest</span>().user;
+    <span class="c-keyword">return</span> data ? user?.[data] : user; <span class="c-comment">// @CurrentUser('email') فقط ایمیل را برمی‌گرداند</span>
+  }
+);</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Testing در NestJS</h2>
+  <p>
+    NestJS با <strong>TestingModule</strong> به شما اجازه می‌دهد Dependency Injection را در تست هم استفاده کنید —
+    به‌راحتی می‌توانید dependency واقعی را با mock جایگزین کنید:
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">users.service.spec.ts</span></div>
+    <div class="code-body"><span class="c-keyword">import</span> { Test, TestingModule } <span class="c-keyword">from</span> <span class="c-string">'@nestjs/testing'</span>;
+<span class="c-keyword">import</span> { UsersService } <span class="c-keyword">from</span> <span class="c-string">'./users.service'</span>;
+<span class="c-keyword">import</span> { getModelToken } <span class="c-keyword">from</span> <span class="c-string">'@nestjs/mongoose'</span>;
+
+<span class="c-fn">describe</span>(<span class="c-string">'UsersService'</span>, () => {
+  <span class="c-keyword">let</span> service: <span class="c-type">UsersService</span>;
+  <span class="c-keyword">let</span> mockUserModel: <span class="c-type">any</span>;
+
+  <span class="c-fn">beforeEach</span>(<span class="c-keyword">async</span> () => {
+    mockUserModel = {
+      findById: jest.<span class="c-fn">fn</span>(),
+      create:   jest.<span class="c-fn">fn</span>(),
+    };
+
+    <span class="c-comment">// TestingModule دقیقاً مثل یک Module واقعی است، ولی dependency را می‌توانید mock کنید</span>
+    <span class="c-keyword">const</span> module: <span class="c-type">TestingModule</span> = <span class="c-keyword">await</span> Test.<span class="c-fn">createTestingModule</span>({
+      providers: [
+        UsersService,
+        {
+          provide:  <span class="c-fn">getModelToken</span>(<span class="c-string">'User'</span>), <span class="c-comment">// جایگزین کردن Mongoose Model واقعی</span>
+          useValue: mockUserModel,
+        },
+      ],
+    }).<span class="c-fn">compile</span>();
+
+    service = module.<span class="c-fn">get</span>&lt;<span class="c-type">UsersService</span>&gt;(UsersService);
+  });
+
+  <span class="c-fn">it</span>(<span class="c-string">'باید کاربر را بر اساس id برگرداند'</span>, <span class="c-keyword">async</span> () => {
+    mockUserModel.findById.<span class="c-fn">mockResolvedValue</span>({ id: <span class="c-string">'1'</span>, name: <span class="c-string">'Ali'</span> });
+
+    <span class="c-keyword">const</span> result = <span class="c-keyword">await</span> service.<span class="c-fn">findOne</span>(<span class="c-string">'1'</span>);
+
+    <span class="c-fn">expect</span>(result.name).<span class="c-fn">toBe</span>(<span class="c-string">'Ali'</span>);
+    <span class="c-fn">expect</span>(mockUserModel.findById).<span class="c-fn">toHaveBeenCalledWith</span>(<span class="c-string">'1'</span>);
+  });
+});</div>
+  </div>
+
+  <h3 class="sub-title">تست E2E با supertest — یادآوری فصل ۵۱</h3>
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">app.e2e-spec.ts</span></div>
+    <div class="code-body"><span class="c-keyword">import</span> * <span class="c-keyword">as</span> request <span class="c-keyword">from</span> <span class="c-string">'supertest'</span>;
+<span class="c-keyword">import</span> { Test } <span class="c-keyword">from</span> <span class="c-string">'@nestjs/testing'</span>;
+<span class="c-keyword">import</span> { AppModule } <span class="c-keyword">from</span> <span class="c-string">'../src/app.module'</span>;
+
+<span class="c-fn">describe</span>(<span class="c-string">'Users E2E'</span>, () => {
+  <span class="c-keyword">let</span> app;
+
+  <span class="c-fn">beforeAll</span>(<span class="c-keyword">async</span> () => {
+    <span class="c-keyword">const</span> moduleRef = <span class="c-keyword">await</span> Test.<span class="c-fn">createTestingModule</span>({
+      imports: [AppModule], <span class="c-comment">// کل اپلیکیشن واقعی</span>
+    }).<span class="c-fn">compile</span>();
+
+    app = moduleRef.<span class="c-fn">createNestApplication</span>();
+    <span class="c-keyword">await</span> app.<span class="c-fn">init</span>();
+  });
+
+  <span class="c-fn">it</span>(<span class="c-string">'GET /users باید لیست کاربران برگرداند'</span>, () => {
+    <span class="c-keyword">return</span> <span class="c-fn">request</span>(app.<span class="c-fn">getHttpServer</span>())
+      .<span class="c-fn">get</span>(<span class="c-string">'/users'</span>)
+      .<span class="c-fn">expect</span>(<span class="c-num">200</span>)
+      .<span class="c-fn">expect</span>(res => {
+        expect(Array.<span class="c-fn">isArray</span>(res.body)).<span class="c-fn">toBe</span>(<span class="c-keyword">true</span>);
+      });
+  });
+});</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">NestJS Microservices — یادآوری فصل ۴۴ و ۶۱</h2>
+  <p>
+    NestJS به‌صورت built-in از چند <strong>transport</strong> برای ارتباط بین سرویس‌ها پشتیبانی می‌کند —
+    TCP، Redis، Kafka، gRPC (فصل ۶۱) و RabbitMQ — بدون نیاز به نوشتن دستی هر بخش:
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">main.ts — راه‌اندازی Microservice با TCP</span></div>
+    <div class="code-body"><span class="c-keyword">import</span> { NestFactory } <span class="c-keyword">from</span> <span class="c-string">'@nestjs/core'</span>;
+<span class="c-keyword">import</span> { Transport } <span class="c-keyword">from</span> <span class="c-string">'@nestjs/microservices'</span>;
+
+<span class="c-keyword">const</span> app = <span class="c-keyword">await</span> NestFactory.<span class="c-fn">createMicroservice</span>(AppModule, {
+  transport: Transport.TCP,
+  options: { host: <span class="c-string">'0.0.0.0'</span>, port: <span class="c-num">3001</span> },
+});
+
+<span class="c-keyword">await</span> app.<span class="c-fn">listen</span>();</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">users.controller.ts — دریافت پیام از سرویس دیگر</span></div>
+    <div class="code-body"><span class="c-keyword">import</span> { MessagePattern, Payload } <span class="c-keyword">from</span> <span class="c-string">'@nestjs/microservices'</span>;
+
+<span class="c-decorator">@Controller</span>()
+<span class="c-keyword">export class</span> <span class="c-fn">UsersController</span> {
+  <span class="c-comment">// معادل یک "endpoint" داخلی بین سرویس‌ها — نه HTTP</span>
+  <span class="c-decorator">@MessagePattern</span>({ cmd: <span class="c-string">'get_user'</span> })
+  <span class="c-fn">getUser</span>(<span class="c-decorator">@Payload</span>() data: { id: <span class="c-type">string</span> }) {
+    <span class="c-keyword">return this</span>.usersService.<span class="c-fn">findOne</span>(data.id);
+  }
+}</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">orders.service.ts — صدا زدن سرویس دیگر با ClientProxy</span></div>
+    <div class="code-body"><span class="c-keyword">import</span> { ClientProxy, Transport, ClientsModule } <span class="c-keyword">from</span> <span class="c-string">'@nestjs/microservices'</span>;
+
+<span class="c-comment">// در module: ثبت اتصال به سرویس Users</span>
+<span class="c-comment">// ClientsModule.register([{ name: 'USERS_SERVICE', transport: Transport.TCP, options: {...} }])</span>
+
+<span class="c-decorator">@Injectable</span>()
+<span class="c-keyword">export class</span> <span class="c-fn">OrdersService</span> {
+  <span class="c-keyword">constructor</span>(<span class="c-decorator">@Inject</span>(<span class="c-string">'USERS_SERVICE'</span>) <span class="c-keyword">private</span> usersClient: <span class="c-type">ClientProxy</span>) {}
+
+  <span class="c-keyword">async</span> <span class="c-fn">createOrder</span>(userId: <span class="c-type">string</span>, items: <span class="c-type">any</span>[]) {
+    <span class="c-comment">// send() یک پیام می‌فرستد و منتظر پاسخ می‌ماند (مثل یک تابع remote)</span>
+    <span class="c-keyword">const</span> user = <span class="c-keyword">await</span> firstValueFrom(
+      <span class="c-keyword">this</span>.usersClient.<span class="c-fn">send</span>({ cmd: <span class="c-string">'get_user'</span> }, { id: userId })
+    );
+    <span class="c-keyword">if</span> (!user) <span class="c-keyword">throw new</span> <span class="c-fn">Error</span>(<span class="c-string">'کاربر یافت نشد'</span>);
+    <span class="c-comment">// ادامه ساخت سفارش...</span>
+  }
+}</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">جدول خلاصه — کدام ابزار برای چه کاری</h2>
+  <div class="compare-grid">
+    <div class="cg-card">
+      <h4 style="color:var(--accent)">Guard</h4>
+      <p>تصمیم می‌گیرد آیا اجازه ورود به route را می‌دهد یا نه (authentication/authorization).</p>
+    </div>
+    <div class="cg-card">
+      <h4 style="color:var(--accent2)">Pipe</h4>
+      <p>داده ورودی را validate یا transform می‌کند، قبل از رسیدن به handler.</p>
+    </div>
+    <div class="cg-card">
+      <h4 style="color:var(--accent3)">Interceptor</h4>
+      <p>کد قبل/بعد از handler اجرا می‌کند — logging، caching، تبدیل response.</p>
+    </div>
+    <div class="cg-card">
+      <h4 style="color:#fbbf24">Exception Filter</h4>
+      <p>فقط وقتی خطا رخ دهد اجرا می‌شود — فرمت پاسخ خطا را کنترل می‌کند.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">نکات کلیدی برای مصاحبه</h2>
+  <ul class="key-points">
+    <li>ترتیب اجرای NestJS: <strong>Middleware → Guard → Interceptor (قبل) → Pipe → Handler → Interceptor (بعد) → Exception Filter</strong>.</li>
+    <li><strong>Pipe</strong> برای validation و transform ورودی — ParseIntPipe، ValidationPipe از پرکاربردترین‌ها.</li>
+    <li><strong>Interceptor</strong> بر پایه RxJS ساخته شده — با <code>next.handle().pipe()</code> می‌توانید قبل و بعد از handler کد اجرا کنید.</li>
+    <li><strong>Exception Filter</strong> فرمت خطا را در کل اپلیکیشن یکسان می‌کند — با <code>@Catch()</code> تعریف می‌شود.</li>
+    <li><strong>Custom Decorator</strong> با <code>createParamDecorator</code> ساخته می‌شود — کد تکراری را در یک اسم ساده جمع می‌کند.</li>
+    <li>در تست NestJS، <strong>TestingModule</strong> اجازه می‌دهد به‌جای dependency واقعی، mock تزریق کنید — بدون نیاز به دیتابیس واقعی.</li>
+    <li>سوال رایج: «فرق Guard و Interceptor چیست؟» — Guard فقط تصمیم می‌گیرد اجازه ورود هست یا نه (بله/خیر)؛ Interceptor کد اضافه اجرا می‌کند و حتی می‌تواند response را تغییر دهد، نه فقط رد یا قبول کند.</li>
+    <li>یک تله رایج: قرار دادن منطق validation سنگین داخل Controller به‌جای Pipe یا DTO — این باعث تکرار کد و سخت شدن تست می‌شود؛ Pipe دقیقاً برای همین ساخته شده.</li>
+    <li>سوال رایج: «چطور NestJS بین چند سرویس بدون HTTP ارتباط برقرار می‌کند؟» — با ماژول Microservices و transport هایی مثل TCP، Redis، یا gRPC (فصل ۶۱)؛ <code>@MessagePattern</code> روی سرویس گیرنده، <code>ClientProxy.send()</code> روی سرویس فرستنده.</li>
+    <li><strong>@nestjs/testing</strong> امکان تست Unit (با mock) و E2E (با کل اپلیکیشن واقعی از طریق supertest) را در یک اکوسیستم یکپارچه می‌دهد.</li>
+    <li>در مصاحبه NestJS، معمولاً از شما خواسته می‌شود توضیح دهید یک Guard یا Interceptor سفارشی چطور می‌نویسید — آماده باشید یک مثال ساده (مثل چک کردن یک header خاص) را زنده بنویسید.</li>
+  </ul>
+
+  <div class="chapter-nav">
+    <a class="nav-btn" href="nodejs-course-chapter62.html">← فصل قبلی: Express.js عمیق</a>
+    <a class="nav-btn next" href="nodejs-course-chapter64.html">فصل بعدی: OOP کامل و Decorators →</a>
+  </div>
+</main>
+<script>
+function toggleMobileMenu(){
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('open');
+}
+document.querySelectorAll('.sidebar .nav-item').forEach(function(link){
+  link.addEventListener('click', function(){
+    document.querySelector('.sidebar').classList.remove('open');
+    document.getElementById('mobileOverlay').classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>

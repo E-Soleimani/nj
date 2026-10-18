@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>دوره جامع Node.js — از مقدماتی تا پیشرفته</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--border:#2a3347;--accent:#4ade80;--accent2:#22d3ee;--accent3:#a78bfa;--text:#e2e8f0;--text-muted:#8b9ab5;--text-dim:#4a5568}
+  body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;min-height:100vh}
+
+  .hero{
+    max-width:1000px;margin:0 auto;padding:5rem 2rem 3rem;text-align:center;
+  }
+  .hero .badge{
+    display:inline-flex;align-items:center;gap:6px;background:rgba(74,222,128,0.1);
+    border:1px solid rgba(74,222,128,0.25);border-radius:20px;padding:6px 16px;
+    font-size:13px;color:var(--accent);margin-bottom:1.5rem;font-weight:500
+  }
+  .hero h1{font-size:2.75rem;font-weight:800;line-height:1.3;margin-bottom:1rem}
+  .hero h1 span{color:var(--accent)}
+  .hero p{font-size:17px;color:var(--text-muted);max-width:600px;margin:0 auto 2rem}
+  .hero-stats{display:flex;justify-content:center;align-items:flex-start;gap:3rem;flex-wrap:wrap;margin-bottom:1rem}
+  .stat{text-align:center;min-width:60px}
+  .stat .num{font-size:1.8rem;font-weight:800;color:var(--accent2);font-family:'Fira Code',monospace}
+  .stat .label{font-size:13px;color:var(--text-dim)}
+
+  .start-btn{
+    display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#0f1117;
+    font-weight:700;padding:14px 32px;border-radius:12px;text-decoration:none;font-size:16px;
+    margin-top:1.5rem;transition:transform 0.15s;
+  }
+  .start-btn:hover{transform:translateY(-2px)}
+
+  .container{max-width:1000px;margin:0 auto;padding:0 2rem 5rem}
+
+  .section-block{margin-bottom:3rem}
+  .section-heading{font-size:1.3rem;font-weight:700;color:var(--text);margin-bottom:0.4rem;display:flex;align-items:center;gap:10px}
+  .section-heading::before{content:'';display:block;width:4px;height:24px;background:var(--accent);border-radius:2px}
+  .section-sub{font-size:14px;color:var(--text-muted);margin-bottom:1.25rem;margin-right:14px}
+
+  .chapters-grid{
+    display:flex;flex-wrap:wrap;gap:0.85rem;
+  }
+  .chapter-card{
+    display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--border);
+    border-radius:12px;padding:14px 16px;text-decoration:none;color:var(--text);transition:all 0.15s;
+    flex:1 1 230px;max-width:calc(33.333% - 0.6rem);
+  }
+  .chapter-card:hover{border-color:var(--accent);background:var(--bg3);transform:translateY(-2px)}
+  .chapter-num{
+    font-family:'Fira Code',monospace;font-size:13px;font-weight:600;color:var(--accent);
+    background:rgba(74,222,128,0.1);border-radius:6px;padding:4px 8px;min-width:32px;text-align:center;flex-shrink:0
+  }
+  .chapter-name{font-size:14px;color:var(--text-muted)}
+  .chapter-card:hover .chapter-name{color:var(--text)}
+
+  footer{text-align:center;padding:2rem;color:var(--text-dim);font-size:13px;border-top:1px solid var(--border)}
+
+  @media(max-width:640px){
+    .hero{padding:3rem 1.25rem 2rem}
+    .hero h1{font-size:1.9rem}
+    .hero p{font-size:15px}
+    .hero-stats{gap:1.5rem}
+    .container{padding:0 1.25rem 3rem}
+    .chapter-card{max-width:calc(50% - 0.45rem)}
+  }
+  @media(max-width:400px){
+    .chapter-card{max-width:100%}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge"><span>●</span> دوره کامل و رایگان</div>
+  <h1>دوره جامع <span>Node.js</span><br/>از مقدماتی تا پیشرفته</h1>
+  <p>۶۴ فصل با توضیحات کامل فارسی و مثال‌های کد عملی — از معماری پایه Node.js تا میکروسرویس، امنیت و DevOps.</p>
+
+  <div class="hero-stats">
+    <div class="stat"><div class="num">64</div><div class="label">فصل</div></div>
+    <div class="stat"><div class="num">5</div><div class="label">بخش</div></div>
+    <div class="stat"><div class="num">100%</div><div class="label">فارسی</div></div>
+  </div>
+
+  <a class="start-btn" href="nodejs-course-chapter1.html">
+    شروع دوره از فصل اول ←
+  </a>
+</div>
+
+<div class="container">
+  <div class="section-block">
+    <h2 class="section-heading">بخش مقدماتی</h2>
+    <p class="section-sub">فصل ۱ تا ۲۳ — معماری Node.js، Git، JavaScript/TypeScript، Testing و پایه‌های Backend</p>
+    <div class="chapters-grid">
+      <a class="chapter-card" href="nodejs-course-chapter1.html">
+        <span class="chapter-num">01</span>
+        <span class="chapter-name">معماری و تاریخچه</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter2.html">
+        <span class="chapter-num">02</span>
+        <span class="chapter-name">توسعه روی Linux</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter3.html">
+        <span class="chapter-num">03</span>
+        <span class="chapter-name">NPM و ماژول‌ها</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter4.html">
+        <span class="chapter-num">04</span>
+        <span class="chapter-name">Semantic Versioning</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter5.html">
+        <span class="chapter-num">05</span>
+        <span class="chapter-name">Git Basics</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter6.html">
+        <span class="chapter-num">06</span>
+        <span class="chapter-name">Git Flow</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter7.html">
+        <span class="chapter-num">07</span>
+        <span class="chapter-name">Github</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter8.html">
+        <span class="chapter-num">08</span>
+        <span class="chapter-name">Testing & TDD</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter9.html">
+        <span class="chapter-num">09</span>
+        <span class="chapter-name">JS Fundamentals</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter10.html">
+        <span class="chapter-num">10</span>
+        <span class="chapter-name">OOP</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter11.html">
+        <span class="chapter-num">11</span>
+        <span class="chapter-name">Advanced JS</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter12.html">
+        <span class="chapter-num">12</span>
+        <span class="chapter-name">TypeScript</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter13.html">
+        <span class="chapter-num">13</span>
+        <span class="chapter-name">Error Handling</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter14.html">
+        <span class="chapter-num">14</span>
+        <span class="chapter-name">Async Programming</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter15.html">
+        <span class="chapter-num">15</span>
+        <span class="chapter-name">Non-Blocking & Concurrency</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter16.html">
+        <span class="chapter-num">16</span>
+        <span class="chapter-name">Async Flow Control</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter17.html">
+        <span class="chapter-num">17</span>
+        <span class="chapter-name">Web Server (Fastify)</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter18.html">
+        <span class="chapter-num">18</span>
+        <span class="chapter-name">Chat Server</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter19.html">
+        <span class="chapter-num">19</span>
+        <span class="chapter-name">Docker</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter20.html">
+        <span class="chapter-num">20</span>
+        <span class="chapter-name">MongoDB</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter21.html">
+        <span class="chapter-num">21</span>
+        <span class="chapter-name">Redis Basics</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter22.html">
+        <span class="chapter-num">22</span>
+        <span class="chapter-name">Frameworks & IOC</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter23.html">
+        <span class="chapter-num">23</span>
+        <span class="chapter-name">NestJS</span>
+      </a>
+    </div>
+  </div>
+  <div class="section-block">
+    <h2 class="section-heading">بخش پیشرفته</h2>
+    <p class="section-sub">فصل ۲۴ تا ۴۴ — Functional Programming، Design Patterns، Microservices، Streams</p>
+    <div class="chapters-grid">
+      <a class="chapter-card" href="nodejs-course-chapter24.html">
+        <span class="chapter-num">24</span>
+        <span class="chapter-name">Currying & Composition</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter25.html">
+        <span class="chapter-num">25</span>
+        <span class="chapter-name">Isomorphic & Idempotent</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter26.html">
+        <span class="chapter-num">26</span>
+        <span class="chapter-name">Functional Data Modeling</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter27.html">
+        <span class="chapter-num">27</span>
+        <span class="chapter-name">Zod</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter28.html">
+        <span class="chapter-num">28</span>
+        <span class="chapter-name">SOLID</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter29.html">
+        <span class="chapter-num">29</span>
+        <span class="chapter-name">GoF Design Patterns</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter30.html">
+        <span class="chapter-num">30</span>
+        <span class="chapter-name">Refactoring</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter31.html">
+        <span class="chapter-num">31</span>
+        <span class="chapter-name">Event Emitter</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter32.html">
+        <span class="chapter-num">32</span>
+        <span class="chapter-name">Pub/Sub (Cluster)</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter33.html">
+        <span class="chapter-num">33</span>
+        <span class="chapter-name">Queues & Brokers</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter34.html">
+        <span class="chapter-num">34</span>
+        <span class="chapter-name">Working with Streams</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter35.html">
+        <span class="chapter-num">35</span>
+        <span class="chapter-name">Custom Streams & Generators</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter36.html">
+        <span class="chapter-num">36</span>
+        <span class="chapter-name">RxJS</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter37.html">
+        <span class="chapter-num">37</span>
+        <span class="chapter-name">12 Factor App</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter38.html">
+        <span class="chapter-num">38</span>
+        <span class="chapter-name">Resilience Patterns</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter39.html">
+        <span class="chapter-num">39</span>
+        <span class="chapter-name">Postgres Basics</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter40.html">
+        <span class="chapter-num">40</span>
+        <span class="chapter-name">TypeORM</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter41.html">
+        <span class="chapter-num">41</span>
+        <span class="chapter-name">TS: Thinking in Types</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter42.html">
+        <span class="chapter-num">42</span>
+        <span class="chapter-name">Web Frameworks Compare</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter43.html">
+        <span class="chapter-num">43</span>
+        <span class="chapter-name">Onion & Clean Architecture</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter44.html">
+        <span class="chapter-num">44</span>
+        <span class="chapter-name">Microservices Patterns</span>
+      </a>
+    </div>
+  </div>
+  <div class="section-block">
+    <h2 class="section-heading">بخش تکمیلی</h2>
+    <p class="section-sub">فصل ۴۵ تا ۵۴ — Authentication، Security، Caching، Monitoring، Testing پیشرفته</p>
+    <div class="chapters-grid">
+      <a class="chapter-card" href="nodejs-course-chapter45.html">
+        <span class="chapter-num">45</span>
+        <span class="chapter-name">Authentication (JWT)</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter46.html">
+        <span class="chapter-num">46</span>
+        <span class="chapter-name">Authorization & RBAC</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter47.html">
+        <span class="chapter-num">47</span>
+        <span class="chapter-name">Security Essentials</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter48.html">
+        <span class="chapter-num">48</span>
+        <span class="chapter-name">Caching Strategies</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter49.html">
+        <span class="chapter-num">49</span>
+        <span class="chapter-name">API Design</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter50.html">
+        <span class="chapter-num">50</span>
+        <span class="chapter-name">Monitoring & Observability</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter51.html">
+        <span class="chapter-num">51</span>
+        <span class="chapter-name">Advanced Testing</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter52.html">
+        <span class="chapter-num">52</span>
+        <span class="chapter-name">Node.js Internals & Memory</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter53.html">
+        <span class="chapter-num">53</span>
+        <span class="chapter-name">Serverless (AWS Lambda)</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter54.html">
+        <span class="chapter-num">54</span>
+        <span class="chapter-name">CI/CD Pipeline کامل</span>
+      </a>
+    </div>
+  </div>
+  <div class="section-block">
+    <h2 class="section-heading">بخش عملی نهایی</h2>
+    <p class="section-sub">فصل ۵۵ تا ۶۱ — PM2، File Upload، Webhooks، Cron، Monorepo، gRPC</p>
+    <div class="chapters-grid">
+      <a class="chapter-card" href="nodejs-course-chapter55.html">
+        <span class="chapter-num">55</span>
+        <span class="chapter-name">PM2 & Process Management</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter56.html">
+        <span class="chapter-num">56</span>
+        <span class="chapter-name">File Upload & Streaming</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter57.html">
+        <span class="chapter-num">57</span>
+        <span class="chapter-name">Webhooks</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter58.html">
+        <span class="chapter-num">58</span>
+        <span class="chapter-name">Cron & Scheduled Tasks</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter59.html">
+        <span class="chapter-num">59</span>
+        <span class="chapter-name">npm Monorepo & Workspaces</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter60.html">
+        <span class="chapter-num">60</span>
+        <span class="chapter-name">Config Validation & Feature Flags</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter61.html">
+        <span class="chapter-num">61</span>
+        <span class="chapter-name">gRPC</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h2 class="section-heading">تمرکز ویژه مصاحبه</h2>
+    <p class="section-sub">فصل ۶۲ تا ۶۳ — Express.js و NestJS به‌صورت کامل و عمیق</p>
+    <div class="chapters-grid">
+      <a class="chapter-card" href="nodejs-course-chapter62.html">
+        <span class="chapter-num">62</span>
+        <span class="chapter-name">Express.js عمیق</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter63.html">
+        <span class="chapter-num">63</span>
+        <span class="chapter-name">NestJS پیشرفته</span>
+      </a>
+      <a class="chapter-card" href="nodejs-course-chapter64.html">
+        <span class="chapter-num">64</span>
+        <span class="chapter-name">OOP کامل و Decorators</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  دوره آموزشی Node.js — ساخته‌شده برای یادگیری و تدریس
+</footer>
+
+</body>
+</html>

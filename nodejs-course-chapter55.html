@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>دوره Node.js پیشرفته — فصل 55</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--border:#2a3347;--accent:#4ade80;--accent2:#22d3ee;--accent3:#a78bfa;--text:#e2e8f0;--text-muted:#8b9ab5;--text-dim:#4a5568;--code-bg:#0d1117}
+body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;display:flex;min-height:100vh;overflow-x:hidden}
+.sidebar{width:280px;min-width:280px;background:var(--bg2);border-left:1px solid var(--border);padding:2rem 0;position:fixed;right:0;top:0;height:100vh;overflow-y:auto;z-index:100}
+.sidebar-logo{padding:0 1.5rem 1.5rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+.sidebar-logo .logo-icon{width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem}
+.sidebar-logo h2{font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px}
+.sidebar-logo p{font-size:12px;color:var(--text-muted)}
+.nav-section-title{font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;padding:0 1.5rem;margin:1.25rem 0 0.5rem}
+.nav-item{display:flex;align-items:center;gap:0.6rem;padding:0.5rem 1.5rem;font-size:12.5px;color:var(--text-muted);cursor:pointer;border-right:3px solid transparent;transition:all 0.15s;text-decoration:none}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(74,222,128,0.08);color:var(--accent);border-right-color:var(--accent);font-weight:500}
+.nav-item .num{font-size:10px;background:var(--bg3);border-radius:4px;padding:1px 5px;min-width:22px;text-align:center;font-family:'Fira Code',monospace}
+.nav-item.active .num{background:rgba(74,222,128,0.15);color:var(--accent)}
+.main{margin-right:280px;flex:1;padding:3rem 3.5rem 5rem;max-width:860px}
+.chapter-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);border-radius:20px;padding:4px 14px;font-size:12px;color:var(--accent);margin-bottom:1rem;font-weight:500}
+h1.chapter-title{font-size:2.2rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:0.75rem}
+h1.chapter-title span{color:var(--accent)}
+.chapter-desc{font-size:16px;color:var(--text-muted);margin-bottom:2.5rem;max-width:600px}
+.divider{height:1px;background:var(--border);margin:2.5rem 0}
+h2.section-title{font-size:1.25rem;font-weight:700;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;gap:10px}
+h2.section-title::before{content:'';display:block;width:4px;height:22px;background:var(--accent);border-radius:2px}
+h3.sub-title{font-size:1rem;font-weight:700;color:var(--accent2);margin:1.5rem 0 0.6rem}
+p{color:var(--text-muted);font-size:15px;margin-bottom:1rem}
+strong{color:var(--text);font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:1rem 0}
+.tag{font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;font-family:'Fira Code',monospace}
+.tag.green{background:rgba(22,101,52,0.4);color:#86efac;border:1px solid rgba(134,239,172,0.2)}
+.tag.blue{background:rgba(30,58,95,0.6);color:#7dd3fc;border:1px solid rgba(125,211,252,0.2)}
+.tag.purple{background:rgba(59,31,110,0.6);color:#c4b5fd;border:1px solid rgba(196,181,253,0.2)}
+.tag.orange{background:rgba(180,83,9,0.4);color:#fdba74;border:1px solid rgba(253,186,116,0.2)}
+.code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:12px;margin:1.25rem 0;overflow:hidden;direction:ltr}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 1rem;background:var(--bg3);border-bottom:1px solid var(--border);direction:ltr}
+.code-header .dots{display:flex;gap:6px}
+.code-header .dot{width:10px;height:10px;border-radius:50%}
+.code-header .dot.red{background:#ff5f56}.code-header .dot.yellow{background:#ffbd2e}.code-header .dot.green{background:#27c93f}
+.code-header .filename{font-size:12px;color:var(--text-muted);font-family:'Fira Code',monospace}
+.code-body{padding:1.25rem 1.5rem;font-family:'Fira Code',monospace;font-size:13.5px;line-height:1.9;overflow-x:auto;white-space:pre;color:#e2e8f0;text-align:left;direction:ltr}
+.c-comment{color:#6b7e99}.c-keyword{color:#c084fc}.c-string{color:#86efac}.c-fn{color:#67e8f9}.c-num{color:#fb923c}.c-op{color:#94a3b8}.c-type{color:#fbbf24}.c-decorator{color:#fb923c}.c-cmd{color:#fbbf24}
+.note-box{background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.25);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0;display:flex;gap:0.75rem}
+.note-box p{color:var(--text-muted);font-size:14px;margin:0}
+.note-box strong{color:var(--accent2)}
+.warn-box{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0;display:flex;gap:0.75rem}
+.warn-box p{color:var(--text-muted);font-size:14px;margin:0}
+.warn-box strong{color:#fbbf24}
+.explain-box{background:var(--bg2);border-right:3px solid var(--accent3);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin:1rem 0}
+.explain-box p{font-size:14px;color:var(--text-muted);margin:0}
+.explain-box strong{color:var(--accent3)}
+.key-points{list-style:none;margin:1rem 0}
+.key-points li{display:flex;gap:0.75rem;align-items:flex-start;margin-bottom:0.75rem;font-size:14px;color:var(--text-muted)}
+.key-points li::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0;margin-top:2px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
+.cg-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem}
+.cg-card h4{font-size:14px;font-weight:700;margin-bottom:8px}
+.cg-card p{font-size:13px;color:var(--text-muted);margin:0 0 4px}
+.chapter-nav{display:flex;justify-content:space-between;margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border)}
+.nav-btn{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:14px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;font-family:'Vazirmatn',sans-serif}
+.nav-btn:hover{border-color:var(--accent);color:var(--accent)}
+.nav-btn.next{background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.3);color:var(--accent)}
+
+
+
+
+  /* --- Fix: راست‌چین کردن کامنت‌های فارسی داخل بلوک کد --- */
+  .c-comment{unicode-bidi:isolate;direction:rtl}
+
+  /* --- Fix: ریسپانسیو کامل --- */
+  @media(max-width:1024px){
+    .main{margin-right:240px;padding:2rem}
+    .sidebar{width:240px;min-width:240px}
+  }
+  @media(max-width:900px){
+    body{display:block}
+    .main{margin-right:0;padding:1.25rem;max-width:100%}
+    h1.chapter-title{font-size:1.6rem}
+    .chapter-desc{font-size:14px}
+    /* Safety net: هر گرید یا فلکس چندستونه در موبایل تک‌ستونی و ایمن شود */
+    .compare-grid,.cg-card,.use-cases,.pattern-grid,.arch-grid,
+    .branch-grid,.cmd-grid,.range-grid,.module-compare,.pillar-grid,
+    .test-types,.ts-benefits,.compare-row,.error-types{grid-template-columns:1fr!important}
+    .semver-box,.di-diagram,.git-states,.tdd-cycle,.ws-clients,.flow-row{flex-wrap:wrap!important}
+    .git-state,.tdd-step{flex:1 1 100%!important;min-width:0!important}
+    .code-body{font-size:12px;padding:1rem}
+    .chapter-nav{flex-direction:column;gap:10px}
+    .nav-btn{width:100%;justify-content:center;text-align:center}
+    .tags{gap:6px}
+    .tag{font-size:11px;padding:3px 10px}
+  }
+  @media(max-width:480px){
+    .main{padding:1rem}
+    h1.chapter-title{font-size:1.35rem}
+    .code-body{font-size:11px;padding:0.75rem}
+    .code-header .filename{font-size:10px}
+    .chapter-badge{font-size:11px;padding:3px 10px}
+  }
+  /* دکمه‌های قبلی/بعدی حالا لینک هستند نه button - استایل یکسان بماند */
+  a.nav-btn{text-decoration:none}
+  a.nav-btn.disabled{opacity:0.4;pointer-events:none;cursor:default}
+
+  /* --- Fix: دکمه همبرگری و منوی موبایل --- */
+  .mobile-menu-btn{
+    display:none;
+    position:fixed;
+    top:16px;
+    right:16px;
+    z-index:200;
+    width:44px;
+    height:44px;
+    background:var(--bg2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+  }
+  .mobile-menu-btn svg{width:22px;height:22px;stroke:var(--accent)}
+  .mobile-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.6);
+    z-index:150;
+  }
+  .mobile-overlay.open{display:block}
+
+  @media(max-width:900px){
+    .mobile-menu-btn{display:flex}
+    .sidebar{
+      display:flex!important;
+      flex-direction:column;
+      transform:translateX(100%);
+      transition:transform 0.25s ease;
+      z-index:180;
+      box-shadow:-4px 0 20px rgba(0,0,0,0.4);
+    }
+    .sidebar.open{transform:translateX(0)}
+    .main{padding-top:4.5rem}
+  }
+</style>
+</head>
+<body>
+<button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="باز کردن منو">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+</button>
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0f1117" stroke-width="2.5" stroke-linecap="round" width="22" height="22"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+    <h2>دوره Node.js</h2><p>۶۳ فصل — مقدماتی تا پیشرفته</p>
+  </div>
+  <div class="nav-section-title">بخش مقدماتی</div>
+  <a class="nav-item" href="nodejs-course-chapter1.html"><span class="num">01</span> معماری و تاریخچه</a>
+  <a class="nav-item" href="nodejs-course-chapter2.html"><span class="num">02</span> توسعه روی Linux</a>
+  <a class="nav-item" href="nodejs-course-chapter3.html"><span class="num">03</span> NPM و ماژول‌ها</a>
+  <a class="nav-item" href="nodejs-course-chapter4.html"><span class="num">04</span> Semantic Versioning</a>
+  <a class="nav-item" href="nodejs-course-chapter5.html"><span class="num">05</span> Git Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter6.html"><span class="num">06</span> Git Flow</a>
+  <a class="nav-item" href="nodejs-course-chapter7.html"><span class="num">07</span> Github</a>
+  <a class="nav-item" href="nodejs-course-chapter8.html"><span class="num">08</span> Testing & TDD</a>
+  <a class="nav-item" href="nodejs-course-chapter9.html"><span class="num">09</span> JS Fundamentals</a>
+  <a class="nav-item" href="nodejs-course-chapter10.html"><span class="num">10</span> OOP</a>
+  <a class="nav-item" href="nodejs-course-chapter11.html"><span class="num">11</span> Advanced JS</a>
+  <a class="nav-item" href="nodejs-course-chapter12.html"><span class="num">12</span> TypeScript</a>
+  <a class="nav-item" href="nodejs-course-chapter13.html"><span class="num">13</span> Error Handling</a>
+  <a class="nav-item" href="nodejs-course-chapter14.html"><span class="num">14</span> Async Programming</a>
+  <a class="nav-item" href="nodejs-course-chapter15.html"><span class="num">15</span> Non-Blocking & Concurrency</a>
+  <a class="nav-item" href="nodejs-course-chapter16.html"><span class="num">16</span> Async Flow Control</a>
+  <a class="nav-item" href="nodejs-course-chapter17.html"><span class="num">17</span> Web Server (Fastify)</a>
+  <a class="nav-item" href="nodejs-course-chapter18.html"><span class="num">18</span> Chat Server</a>
+  <a class="nav-item" href="nodejs-course-chapter19.html"><span class="num">19</span> Docker</a>
+  <a class="nav-item" href="nodejs-course-chapter20.html"><span class="num">20</span> MongoDB</a>
+  <a class="nav-item" href="nodejs-course-chapter21.html"><span class="num">21</span> Redis Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter22.html"><span class="num">22</span> Frameworks & IOC</a>
+  <a class="nav-item" href="nodejs-course-chapter23.html"><span class="num">23</span> NestJS</a>
+  <div class="nav-section-title">بخش پیشرفته</div>
+  <a class="nav-item" href="nodejs-course-chapter24.html"><span class="num">24</span> Currying & Composition</a>
+  <a class="nav-item" href="nodejs-course-chapter25.html"><span class="num">25</span> Isomorphic & Idempotent</a>
+  <a class="nav-item" href="nodejs-course-chapter26.html"><span class="num">26</span> Functional Data Modeling</a>
+  <a class="nav-item" href="nodejs-course-chapter27.html"><span class="num">27</span> Zod</a>
+  <a class="nav-item" href="nodejs-course-chapter28.html"><span class="num">28</span> SOLID</a>
+  <a class="nav-item" href="nodejs-course-chapter29.html"><span class="num">29</span> GoF Design Patterns</a>
+  <a class="nav-item" href="nodejs-course-chapter30.html"><span class="num">30</span> Refactoring</a>
+  <a class="nav-item" href="nodejs-course-chapter31.html"><span class="num">31</span> Event Emitter</a>
+  <a class="nav-item" href="nodejs-course-chapter32.html"><span class="num">32</span> Pub/Sub (Cluster)</a>
+  <a class="nav-item" href="nodejs-course-chapter33.html"><span class="num">33</span> Queues & Brokers</a>
+  <a class="nav-item" href="nodejs-course-chapter34.html"><span class="num">34</span> Working with Streams</a>
+  <a class="nav-item" href="nodejs-course-chapter35.html"><span class="num">35</span> Custom Streams & Generators</a>
+  <a class="nav-item" href="nodejs-course-chapter36.html"><span class="num">36</span> RxJS</a>
+  <a class="nav-item" href="nodejs-course-chapter37.html"><span class="num">37</span> 12 Factor App</a>
+  <a class="nav-item" href="nodejs-course-chapter38.html"><span class="num">38</span> Resilience Patterns</a>
+  <a class="nav-item" href="nodejs-course-chapter39.html"><span class="num">39</span> Postgres Basics</a>
+  <a class="nav-item" href="nodejs-course-chapter40.html"><span class="num">40</span> TypeORM</a>
+  <a class="nav-item" href="nodejs-course-chapter41.html"><span class="num">41</span> TS: Thinking in Types</a>
+  <a class="nav-item" href="nodejs-course-chapter42.html"><span class="num">42</span> Web Frameworks Compare</a>
+  <a class="nav-item" href="nodejs-course-chapter43.html"><span class="num">43</span> Onion & Clean Architecture</a>
+  <a class="nav-item" href="nodejs-course-chapter44.html"><span class="num">44</span> Microservices Patterns</a>
+  <div class="nav-section-title">بخش تکمیلی</div>
+  <a class="nav-item" href="nodejs-course-chapter45.html"><span class="num">45</span> Authentication (JWT)</a>
+  <a class="nav-item" href="nodejs-course-chapter46.html"><span class="num">46</span> Authorization & RBAC</a>
+  <a class="nav-item" href="nodejs-course-chapter47.html"><span class="num">47</span> Security Essentials</a>
+  <a class="nav-item" href="nodejs-course-chapter48.html"><span class="num">48</span> Caching Strategies</a>
+  <a class="nav-item" href="nodejs-course-chapter49.html"><span class="num">49</span> API Design</a>
+  <a class="nav-item" href="nodejs-course-chapter50.html"><span class="num">50</span> Monitoring & Observability</a>
+  <a class="nav-item" href="nodejs-course-chapter51.html"><span class="num">51</span> Advanced Testing</a>
+  <a class="nav-item" href="nodejs-course-chapter52.html"><span class="num">52</span> Node.js Internals & Memory</a>
+  <a class="nav-item" href="nodejs-course-chapter53.html"><span class="num">53</span> Serverless (AWS Lambda)</a>
+  <a class="nav-item" href="nodejs-course-chapter54.html"><span class="num">54</span> CI/CD Pipeline کامل</a>
+  <div class="nav-section-title">بخش عملی نهایی</div>
+  <a class="nav-item active" href="nodejs-course-chapter55.html"><span class="num">55</span> PM2 & Process Management</a>
+  <a class="nav-item" href="nodejs-course-chapter56.html"><span class="num">56</span> File Upload & Streaming</a>
+  <a class="nav-item" href="nodejs-course-chapter57.html"><span class="num">57</span> Webhooks</a>
+  <a class="nav-item" href="nodejs-course-chapter58.html"><span class="num">58</span> Cron & Scheduled Tasks</a>
+  <a class="nav-item" href="nodejs-course-chapter59.html"><span class="num">59</span> npm Monorepo & Workspaces</a>
+  <a class="nav-item" href="nodejs-course-chapter60.html"><span class="num">60</span> Config Validation & Feature Flags</a>
+  <a class="nav-item" href="nodejs-course-chapter61.html"><span class="num">61</span> gRPC</a>
+  <div class="nav-section-title">تمرکز ویژه مصاحبه</div>
+  <a class="nav-item" href="nodejs-course-chapter62.html"><span class="num">62</span> Express.js عمیق</a>
+  <a class="nav-item" href="nodejs-course-chapter63.html"><span class="num">63</span> NestJS پیشرفته</a>
+  <a class="nav-item" href="nodejs-course-chapter64.html"><span class="num">64</span> OOP کامل و Decorators</a>
+</aside>
+
+<main class="main">
+  <div class="chapter-badge"><span>●</span> فصل پنجاه و پنجم</div>
+  <h1 class="chapter-title">PM2 &<br/><span>Process Management</span></h1>
+  <p class="chapter-desc">استاندارد صنعتی برای اجرای Node.js در production — auto-restart، cluster mode، zero-downtime reload و مدیریت لاگ با PM2.</p>
+  <div class="tags"><span class="tag green">PM2</span><span class="tag blue">Cluster Mode</span><span class="tag purple">Zero-Downtime</span><span class="tag green">Ecosystem File</span></div>
+  <div class="divider"></div>
+
+  <h2 class="section-title">چرا PM2 لازم است؟</h2>
+  <p>
+    <code>node server.js</code> برای production کافی نیست — اگر برنامه crash کند، دیگر بالا نمی‌آید.
+    اگر بخواهید همه CPU coreها را استفاده کنید، باید خودتان Cluster بنویسید (فصل ۱۵).
+    <strong>PM2</strong> یک Process Manager است که همه این‌ها را با چند دستور ساده حل می‌کند —
+    استاندارد صنعتی برای اجرای Node.js در production بدون Docker/Kubernetes.
+  </p>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">نصب و استفاده پایه</h2>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">terminal</span></div>
+    <div class="code-body">npm install -g pm2
+
+<span class="c-comment"># اجرای ساده</span>
+pm2 start server.js --name my-api
+
+<span class="c-comment"># اجرا با تمام CPU coreها (Cluster mode — یادآوری فصل 15)</span>
+pm2 start server.js -i max --name my-api
+
+<span class="c-comment"># لیست process‌های در حال اجرا</span>
+pm2 list
+
+<span class="c-comment"># لاگ‌های زنده</span>
+pm2 logs my-api
+
+<span class="c-comment"># مانیتور CPU/Memory به صورت زنده</span>
+pm2 monit
+
+<span class="c-comment"># ری‌استارت / توقف / حذف</span>
+pm2 restart my-api
+pm2 stop my-api
+pm2 delete my-api</div>
+  </div>
+
+  <div class="explain-box">
+    <p><strong>چرا -i max؟</strong> این دستور به تعداد CPU coreهای موجود، instance موازی از برنامه اجرا می‌کند — دقیقاً همان کاری که در فصل Cluster دستی می‌نوشتیم، ولی PM2 آن را با یک flag انجام می‌دهد.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Ecosystem File — تنظیمات حرفه‌ای</h2>
+  <p>
+    برای production واقعی، بهتر است تنظیمات را در یک فایل جدا (<code>ecosystem.config.js</code>) نگه دارید —
+    قابل commit در Git، قابل استفاده در چند محیط:
+  </p>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">ecosystem.config.js</span></div>
+    <div class="code-body">module.exports = {
+  apps: [{
+    name:   <span class="c-string">'my-api'</span>,
+    script: <span class="c-string">'./src/server.js'</span>,
+
+    <span class="c-comment">// Cluster mode با تعداد instance مشخص</span>
+    instances: <span class="c-string">'max'</span>,   <span class="c-comment">// یا عدد ثابت مثل 4</span>
+    exec_mode: <span class="c-string">'cluster'</span>,
+
+    <span class="c-comment">// راه‌اندازی مجدد خودکار</span>
+    autorestart: <span class="c-keyword">true</span>,
+    max_restarts: <span class="c-num">10</span>,     <span class="c-comment">// بعد از 10 crash پشت سر هم، دیگر تلاش نکن</span>
+    min_uptime: <span class="c-string">'10s'</span>,   <span class="c-comment">// اگر کمتر از 10 ثانیه زنده ماند، crash محسوب می‌شود</span>
+
+    <span class="c-comment">// محدودیت حافظه — اگر بیشتر مصرف شد، خودکار restart می‌شود</span>
+    max_memory_restart: <span class="c-string">'500M'</span>,
+
+    <span class="c-comment">// Environment variables مخصوص هر محیط</span>
+    env: {
+      NODE_ENV: <span class="c-string">'development'</span>,
+      PORT: <span class="c-num">3000</span>
+    },
+    env_production: {
+      NODE_ENV: <span class="c-string">'production'</span>,
+      PORT: <span class="c-num">8080</span>
+    },
+
+    <span class="c-comment">// مدیریت لاگ</span>
+    error_file: <span class="c-string">'./logs/error.log'</span>,
+    out_file:   <span class="c-string">'./logs/out.log'</span>,
+    log_date_format: <span class="c-string">'YYYY-MM-DD HH:mm:ss'</span>,
+
+    <span class="c-comment">// watch — در development فایل‌ها را زیر نظر بگیر و restart کن (شبیه nodemon)</span>
+    watch: <span class="c-keyword">false</span>, <span class="c-comment">// در production همیشه false</span>
+  }]
+};</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">terminal — استفاده از ecosystem file</span></div>
+    <div class="code-body"><span class="c-comment"># اجرا با محیط production</span>
+pm2 start ecosystem.config.js --env production
+
+<span class="c-comment"># reload تنظیمات بدون توقف کامل</span>
+pm2 reload ecosystem.config.js --env production</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Zero-Downtime Reload</h2>
+  <p>
+    مشکل <code>restart</code>: همه instanceها همزمان متوقف و دوباره شروع می‌شوند —
+    یعنی چند ثانیه downtime واقعی. <code>reload</code> این مشکل را حل می‌کند:
+  </p>
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">zero-downtime.txt</span></div>
+    <div class="code-body">pm2 restart my-api
+<span class="c-comment"># ❌ همه instance‌ها با هم متوقف می‌شوند — چند ثانیه سایت پایین است</span>
+
+pm2 reload my-api
+<span class="c-comment"># ✅ یکی‌یکی instance‌ها را عوض می‌کند (rolling restart)
+# همیشه حداقل یک instance زنده و در حال پاسخ‌گویی است
+# نیاز به cluster mode دارد (exec_mode: 'cluster')</span></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">Startup Script — زنده ماندن بعد از reboot سرور</h2>
+  <div class="code-block">
+    <div class="code-header"><div class="dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div><span class="filename">terminal</span></div>
+    <div class="code-body"><span class="c-comment"># ساخت startup script برای سیستم‌عامل (systemd و...)</span>
+pm2 startup
+
+<span class="c-comment"># ذخیره لیست فعلی process‌ها — بعد از reboot خودکار بازیابی می‌شوند</span>
+pm2 save
+
+<span class="c-comment"># حالا اگر سرور reboot شود، PM2 خودکار همه process‌ها را دوباره اجرا می‌کند</span></div>
+  </div>
+
+  <div class="warn-box">
+    <span style="font-size:18px;flex-shrink:0">⚠️</span>
+    <p><strong>PM2 در مقابل Docker/Kubernetes:</strong> PM2 برای یک سرور تنها یا چند سرور ساده عالی است. برای معماری microservices پیچیده با orchestration خودکار، Kubernetes معمولاً بهتر است. خیلی از پروژه‌های واقعی هر دو را ترکیب می‌کنند: PM2 داخل هر Docker container.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2 class="section-title">نکات کلیدی برای مصاحبه</h2>
+  <ul class="key-points">
+    <li><strong>PM2</strong> جایگزین نوشتن دستی Cluster است — با <code>-i max</code> از همه CPU coreها استفاده می‌کند.</li>
+    <li><strong>ecosystem.config.js</strong> تنظیمات را قابل نسخه‌کنترل و قابل استفاده در چند محیط می‌کند.</li>
+    <li><strong>reload</strong> به جای <strong>restart</strong> برای zero-downtime deployment — rolling update.</li>
+    <li><strong>max_memory_restart</strong> از memory leak جلوگیری کامل نمی‌کند ولی damage control می‌کند.</li>
+    <li><strong>pm2 startup + pm2 save</strong> برای بازیابی خودکار process‌ها بعد از reboot سرور.</li>
+    <li>PM2 مناسب سرورهای ساده/متوسط است؛ برای microservices بزرگ، Kubernetes رایج‌تر است.</li>
+    <li>سوال رایج: «چرا reload بهتر از restart است؟» — restart همه instanceها را همزمان متوقف و دوباره اجرا می‌کند (چند ثانیه downtime واقعی)؛ reload یکی‌یکی instanceها را عوض می‌کند، همیشه حداقل یکی زنده و پاسخگو است.</li>
+    <li>یک تله رایج: تنظیم <code>watch: true</code> در production — این گزینه فقط برای development مناسب است؛ در production حجم فایل زیاد می‌تواند مصرف CPU غیرضروری ایجاد کند.</li>
+    <li>PM2 با <code>pm2 logs</code> لاگ‌های همه process‌ها را یکجا نشان می‌دهد — برای دیباگ سریع در production بدون نیاز به SSH به هر سرور جدا خیلی مفید است.</li>
+    <li>در معماری Docker، معمولاً یا از PM2 داخل container استفاده می‌شود، یا از orchestrator بیرونی (Kubernetes) که خودش auto-restart و scaling را انجام می‌دهد — همزمان استفاده از هر دو معمولاً غیرضروری است.</li>
+  </ul>
+
+  <div class="chapter-nav">
+    <a class="nav-btn" href="nodejs-course-chapter54.html">← فصل قبلی: CI/CD Pipeline کامل</a>
+    <a class="nav-btn next" href="nodejs-course-chapter56.html">فصل بعدی: File Upload & Streaming →</a>
+  </div>
+</main>
+<script>
+function toggleMobileMenu(){
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('open');
+}
+// بستن منو با کلیک روی هر لینک فصل (تجربه بهتر در موبایل)
+document.querySelectorAll('.sidebar .nav-item').forEach(function(link){
+  link.addEventListener('click', function(){
+    document.querySelector('.sidebar').classList.remove('open');
+    document.getElementById('mobileOverlay').classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>
